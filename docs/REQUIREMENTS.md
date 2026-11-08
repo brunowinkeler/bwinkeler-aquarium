@@ -83,14 +83,15 @@ AI segmentation, TV brands other than LG webOS (unless they need no extra work),
 
 ### 3.3 Capture and preview
 
-| ID        | Requirement                                                                                                                                  | Verification |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-CAP-01 | The phone shall take a photo in the app or load one from the gallery.                                                                        | D            |
-| FR-CAP-02 | The phone shall remove the white paper on the device, without AI, reaching IoU ≥ 0.95 on the reference fixtures.                             | T            |
-| FR-CAP-03 | The user shall be able to adjust the paper corners by hand; a printed template with ArUco markers shall skip this.                           | D            |
-| FR-CAP-04 | The enclosed white interior of an outline-only drawing shall stay opaque.                                                                    | T            |
-| FR-CAP-05 | The preview shall animate the creature with the same engine and assets as the TV.                                                            | I            |
-| FR-CAP-06 | The user shall choose the creature kind (`swim`, `pulse`, `walk`, `glide`), its facing and an optional author name of at most 24 characters. | T            |
+| ID        | Requirement                                                                                                                                                                   | Verification |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| FR-CAP-01 | The phone shall take a photo in the app or load one from the gallery.                                                                                                         | D            |
+| FR-CAP-02 | The phone shall remove the white paper on the device, without AI, reaching IoU ≥ 0.95 on the reference fixtures.                                                              | T            |
+| FR-CAP-03 | The user shall be able to adjust the paper corners by hand; a printed template with ArUco markers shall skip this.                                                            | D            |
+| FR-CAP-04 | The enclosed white interior of an outline-only drawing shall stay opaque.                                                                                                     | T            |
+| FR-CAP-05 | The preview shall animate the creature with the same engine and assets as the TV.                                                                                             | I            |
+| FR-CAP-06 | The user shall choose the creature kind (`swim`, `pulse`, `walk`, `glide`), its facing, its size (small, medium, large) and an optional author name of at most 24 characters. | T            |
+| FR-CAP-07 | The user shall be able to send a cropped photo as it is, without paper removal.                                                                                               | T            |
 
 ### 3.4 Sending
 
@@ -101,7 +102,7 @@ AI segmentation, TV brands other than LG webOS (unless they need no extra work),
 | FR-SEND-03 | The TV shall show exactly the pixels the phone previewed.                                                                                         | T, D         |
 | FR-SEND-04 | The phone shall confirm when the TV has displayed the creature.                                                                                   | T            |
 | FR-SEND-05 | An aquarium shall keep at most 20 creatures; the oldest shall leave the scene and be deleted.                                                     | T            |
-| FR-SEND-06 | Any phone of the aquarium shall be able to remove a creature.                                                                                     | T            |
+| FR-SEND-06 | Any phone of the aquarium shall be able to remove a creature, after confirming it in the page.                                                    | T            |
 | FR-SEND-07 | An aquarium shall accept at most 60 creatures per hour (configurable).                                                                            | T            |
 
 ### 3.5 TV display
@@ -112,6 +113,9 @@ AI segmentation, TV brands other than LG webOS (unless they need no extra work),
 | FR-TV-02 | Creatures shall move according to their kind, with smooth body deformation.                                        | D            |
 | FR-TV-03 | The TV shall receive changes in real time, resynchronize after reconnecting and show a discreet offline indicator. | T, D         |
 | FR-TV-04 | The TV shall be fully usable with the remote: OK, Back, arrows and the color keys.                                 | D            |
+| FR-TV-05 | A browser page (`/pc/`) shall offer the same actions as clickable controls, for a mouse or touch screen.           | T            |
+| FR-TV-06 | A live aquarium shall play a generated sea ambience that can be turned off; the choice shall be remembered.        | T, D         |
+| FR-TV-07 | Demo creatures and a seabed (rocks, corals, shells, starfish) shall keep the scene looking like the sea.           | D            |
 
 ## 4. Non-functional requirements
 

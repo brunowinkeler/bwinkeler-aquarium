@@ -38,11 +38,13 @@ bundle.
 
 `npm run test:e2e` (after `npm run build`) starts a clean local Worker (`dev:e2e`, port 8787) and
 drives the whole flow in Chromium: the TV at `/tv/` creates an aquarium, a phone joins with the code,
-sends a photographed drawing, sees it confirmed on the TV and lists it, opens the printable
-templates and sends a photographed template (corners and kind found automatically), then the TV
-ends the aquarium; axe checks the phone screens. CI runs `validate`, checks that the icons and the
-templates are reproducible and runs the end-to-end tests on every push to `main` and on pull
-requests.
+sends a large photographed drawing, sees it confirmed on the TV and lists it, opens the printable
+templates and sends a photographed template (corners and kind found automatically), sends a
+cropped photo as it is, removes a creature, then the TV ends the aquarium; a second test drives
+`/pc/` with clicks only (code panel, sound toggle, menu). axe checks the phone screens. Each run
+creates two aquariums, so wait a minute between runs (3 creations per minute per IP). CI runs
+`validate`, checks that the icons and the templates are reproducible and runs the end-to-end tests
+on every push to `main` and on pull requests.
 
 ## Cloudflare resources (one-time, manual)
 
@@ -77,8 +79,8 @@ version is tagged with the release) and waits for `/health/ready`. A manual depl
 after `npm run validate` (`npx wrangler deploy`) remains possible with the local OAuth login.
 
 After a deploy, run the end-to-end suite against production:
-`E2E_BASE_URL=https://aquarium.bwinkeler.com npm run test:e2e`. It creates one short-lived aquarium
-and ends it, like a real session.
+`E2E_BASE_URL=https://aquarium.bwinkeler.com npm run test:e2e`. It creates two short-lived
+aquariums and ends them, like real sessions.
 
 The first deploy created the Custom Domain and its certificate. Roll back with
 `npx wrangler rollback` (list candidates with `npx wrangler versions list`). SQL migrations are

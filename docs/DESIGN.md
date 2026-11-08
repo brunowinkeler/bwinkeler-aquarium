@@ -2,7 +2,7 @@
 
 Living design document for Aquarium (`service_id: aquarium`), a product of the `bwinkeler.com` platform. It follows the platform contract `BW-PLATFORM-ARCH-001` v1.3 (`bwinkeler-infra/ARCHITECTURE.md`); where the two conflict, the platform contract and its precedence rules prevail, and every deviation is listed in [5. Platform conformance](#5-platform-conformance). Platform facts were verified against official documentation and source code between 2026-11-03 and 2026-11-07.
 
-**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a procedural backdrop.
+**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build, plus `/pc/` with clickable controls (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a procedural backdrop.
 **Last updated:** 2026-11-08.
 
 | Field             | Value                                                        |
@@ -447,6 +447,7 @@ $$F = \frac{C - (1-\alpha)\,W}{\alpha}$$
 | Close outlines      | About 0.6% of the long side                       | Bridges gaps so the interior gets filled                                                                            |
 | Include loose parts | Off                                               | Keeps parts far from the main body; otherwise only the main group (parts within about 2% of the image size) is kept |
 | Kind, flip, rotate  | From the template; otherwise `swim`, facing right | Motion profile and head direction                                                                                   |
+| Size                | Medium                                            | Small (the size before v0.4), medium (1.35×) or large (1.75×) on the TV; the preview compresses the range           |
 
 ### 9.4 Printable template
 
@@ -491,7 +492,8 @@ $$F = \frac{C - (1-\alpha)\,W}{\alpha}$$
 - Decode and downscale on the main thread, then transfer the RGBA buffer to the Web Worker, which avoids depending on `OffscreenCanvas` support in workers.
 - Output PNG through `canvas.toBlob('image/png')`; WebP encoding is not available in every mobile browser.
 - The preview plays the same background video as the TV (720p copy) and uses the same engine, seeded with the creature ID.
-- A service worker caches the app shell, the background video and the templates, and never handles `/api/*`, `/ws/*` or `/tv/*`; capture and preview work offline, sending needs the network.
+- A service worker caches the app shell, the background video and the templates, and never handles `/api/*`, `/ws/*`, `/tv/*` or `/pc/*`; capture and preview work offline, sending needs the network.
+- Photo as it is: at the corner step the phone can pick "a photo" instead of "a drawing". The corners then frame the whole photo, and `extractPhoto` only straightens and crops it (warp at twice the output size, then area-average down to at most 512 px), so the opaque picture swims like a drawing.
 - Session: joining sets the `aquarium_sid` cookie (`Secure`, `HttpOnly`, `SameSite=Lax`). State-changing requests also send a custom header, and the Worker checks that `Origin` is `https://aquarium.bwinkeler.com`; together they block cross-site requests.
 - `public/_headers`, adapted from Practice Companion: `camera=(self)` in `Permissions-Policy` (QR scanning), `media-src 'self'` for the background video, `img-src 'self' data: blob:` for previews, `connect-src 'self'`, and `no-cache` for `sw.js` and the manifest.
 - Install: on iOS, Share → Add to Home Screen; on Android, the install prompt.
@@ -569,8 +571,10 @@ Right after creation, with the join panel open. Once the first phone joins, the 
 - **RelayClient:** WebSocket `/ws/tv/{aquariumId}` with `auth` as the first message, exponential backoff and jitter, app-level ping every 30 s, full snapshot resync after reconnecting, revision-gap detection, polling fallback, discreet offline indicator.
 - **Images:** fetched with XHR (`Authorization` header) from `/api/tv/creatures/{id}/image` as a Blob, decoded with `createImageBitmap` or an object URL, and uploaded as a WebGL texture.
 - **Offline start:** creature metadata and PNGs are cached in IndexedDB and cleared when the aquarium ends.
-- **Empty aquarium:** a few CC0 demo fish swim until the first drawing arrives; the join panel stays open until the first phone joins.
-- **Browser build:** the same bundle at `/tv/` runs in other TVs' browsers, on a PC over HDMI, or on a Raspberry Pi in kiosk mode.
+- **Empty aquarium:** six hand-drawn demo creatures swim until drawings arrive, and the first three always stay, so a single drawing still looks like the sea; the join panel stays open until the first phone joins.
+- **Seabed:** the backdrop paints rocks, branching, fan, brain and tube corals, shells and starfish once per resize into the cached layer, so they cost nothing per frame.
+- **Sound:** a generated ambience (Web Audio: slow pad chords, sparse bells, filtered-noise waves and bubbles, a feedback delay instead of reverb) plays while the aquarium is live; nothing is recorded, so nothing needs a license. Browsers keep it suspended until the first click or key press. "Sound" in the menu, and in the `/pc/` toolbar, turns it off and is remembered.
+- **Browser build:** the same bundle at `/tv/` runs in other TVs' browsers, on a PC over HDMI, or on a Raspberry Pi in kiosk mode. `/pc/` serves it with `data-input="pointer"`: buttons at the top right (show code, sound, full screen, menu) replace the OK and Back hints, the join panel gets a close button, and the toolbar and cursor fade out while the mouse rests.
 
 ### 10.5 Background video asset
 
@@ -726,6 +730,7 @@ erDiagram
     string id PK "ULID generated on the phone"
     string kind "swim/pulse/walk/glide"
     string facing "left/right"
+    string size "small/medium/large (small before v0.4)"
     string author
     int width
     int height
