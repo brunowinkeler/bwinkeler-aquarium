@@ -10,6 +10,9 @@ export function CreaturesPage() {
   const { lost } = useSession();
   const [list, setList] = useState<CreatureListResponse | null>(null);
   const [error, setError] = useState<MessageKey | null>(null);
+  // An in-page question: some browsers silently suppress window.confirm.
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
 
   const fail = useCallback(
     (failure: unknown) => {
@@ -33,12 +36,15 @@ export function CreaturesPage() {
   }, [show]);
 
   const remove = async (id: string) => {
-    if (!window.confirm(t('list.removeConfirm'))) return;
+    setRemoving(true);
     try {
       await api.remove(id);
+      setConfirming(null);
       await show(api.creatures());
     } catch (failure) {
       fail(failure);
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -81,13 +87,34 @@ export function CreaturesPage() {
                   {creature.author && <span>{t('list.by', { name: creature.author })}</span>}
                   {creature.mine && <span className="badge">{t('list.mine')}</span>}
                 </span>
-                <button
-                  type="button"
-                  className="button button--small"
-                  onClick={() => void remove(creature.id)}
-                >
-                  {t('list.remove')}
-                </button>
+                {confirming === creature.id ? (
+                  <span className="creature__confirm">
+                    <span>{t('list.removeConfirm')}</span>
+                    <button
+                      type="button"
+                      className="button button--small button--danger"
+                      onClick={() => void remove(creature.id)}
+                      disabled={removing}
+                    >
+                      {t('list.removeYes')}
+                    </button>
+                    <button
+                      type="button"
+                      className="button button--small"
+                      onClick={() => setConfirming(null)}
+                    >
+                      {t('common.cancel')}
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="button button--small"
+                    onClick={() => setConfirming(creature.id)}
+                  >
+                    {t('list.remove')}
+                  </button>
+                )}
               </li>
             ))}
           </ul>

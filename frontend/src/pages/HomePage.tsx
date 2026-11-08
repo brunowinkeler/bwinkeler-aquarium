@@ -11,6 +11,7 @@ export function HomePage() {
   const { setPhoto } = useDraft();
   const navigate = useNavigate();
   const [error, setError] = useState<MessageKey | null>(null);
+  const [confirmingLeave, setConfirmingLeave] = useState(false);
 
   if (state.status !== 'joined') return null;
   const { session } = state;
@@ -24,7 +25,6 @@ export function HomePage() {
   };
 
   const onLeave = async () => {
-    if (!window.confirm(t('home.leaveConfirm'))) return;
     try {
       await leave();
       void navigate('/join', { replace: true });
@@ -92,9 +92,27 @@ export function HomePage() {
           {t(error)}
         </p>
       )}
-      <button type="button" className="button button--quiet" onClick={() => void onLeave()}>
-        {t('home.leave')}
-      </button>
+      {confirmingLeave ? (
+        <div className="panel confirm">
+          <p>{t('home.leaveConfirm')}</p>
+          <div className="actions">
+            <button type="button" className="button button--danger" onClick={() => void onLeave()}>
+              {t('home.leaveYes')}
+            </button>
+            <button type="button" className="button" onClick={() => setConfirmingLeave(false)}>
+              {t('common.cancel')}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="button button--quiet"
+          onClick={() => setConfirmingLeave(true)}
+        >
+          {t('home.leave')}
+        </button>
+      )}
     </section>
   );
 }

@@ -92,6 +92,16 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await expect(phone.getByText('Já está nadando na TV!')).toBeVisible({ timeout: 20_000 });
   await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(2);
 
+  // Removal asks inside the page; window.confirm is suppressed by some browsers.
+  await phone.getByRole('link', { name: 'Ver o aquário' }).click();
+  await expect(phone.getByRole('listitem')).toHaveCount(2);
+  await phone.getByRole('button', { name: 'Remover' }).first().click();
+  await expect(phone.getByText('Remover esta criatura do aquário?')).toBeVisible();
+  await expectAccessible(phone);
+  await phone.getByRole('button', { name: 'Sim, remover' }).click();
+  await expect(phone.getByRole('listitem')).toHaveCount(1);
+  await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(1);
+
   await tv.keyboard.press('Escape');
   await tv.getByRole('button', { name: 'Encerrar aquário' }).click();
   await expect(tv.getByText('O aquário terminou.')).toBeVisible();

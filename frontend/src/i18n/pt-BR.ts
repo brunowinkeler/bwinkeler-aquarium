@@ -48,6 +48,7 @@ export const ptBR = {
   'home.list': 'Criaturas do aquário',
   'home.leave': 'Sair do aquário',
   'home.leaveConfirm': 'Sair deste aquário? Para voltar, use um código da TV.',
+  'home.leaveYes': 'Sim, sair',
 
   'create.loading': 'Abrindo a foto…',
   'create.decodeError': 'Não foi possível abrir esta foto. Tente outra.',
@@ -107,6 +108,7 @@ export const ptBR = {
   'list.uploading': 'Enviando…',
   'list.remove': 'Remover',
   'list.removeConfirm': 'Remover esta criatura do aquário?',
+  'list.removeYes': 'Sim, remover',
   'list.imageAlt': 'Desenho: {kind}',
 } as const;
 

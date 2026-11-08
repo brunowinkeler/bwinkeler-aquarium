@@ -50,6 +50,7 @@ export const en: Messages = {
   'home.list': 'Creatures in this aquarium',
   'home.leave': 'Leave the aquarium',
   'home.leaveConfirm': 'Leave this aquarium? To come back, use a code from the TV.',
+  'home.leaveYes': 'Yes, leave',
 
   'create.loading': 'Opening the photo…',
   'create.decodeError': 'This photo could not be opened. Try another one.',
@@ -109,5 +110,6 @@ export const en: Messages = {
   'list.uploading': 'Uploading…',
   'list.remove': 'Remove',
   'list.removeConfirm': 'Remove this creature from the aquarium?',
+  'list.removeYes': 'Yes, remove',
   'list.imageAlt': 'Drawing: {kind}',
 };

@@ -254,6 +254,15 @@ h1 {
   text-decoration: underline;
 }
 
+.button--danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.confirm p {
+  margin: 0 0 0.75rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -505,11 +514,26 @@ h1 {
 
 .creature {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem;
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+.creature__confirm {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.creature__confirm > span {
+  flex: 1 1 auto;
+  font-weight: 600;
 }
 
 .creature__image {
