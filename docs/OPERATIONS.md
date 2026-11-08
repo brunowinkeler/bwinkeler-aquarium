@@ -31,7 +31,7 @@ command on every push to `main` and on pull requests.
 ## Cloudflare resources (one-time, manual)
 
 These steps touch the shared Cloudflare account; run them only when the first deploy is approved.
-All four were done on 2026-11-08; the deploy token stays unused until `deploy.yaml` exists.
+All four were done on 2026-11-08.
 
 1. Create the private bucket: `npx wrangler r2 bucket create bwinkeler-aquarium-files`.
 2. Set the IP hashing key from `backend/`: `npx wrangler secret put IP_HASH_KEY` with a random value
@@ -43,14 +43,21 @@ All four were done on 2026-11-08; the deploy token stays unused until `deploy.ya
 
 ## Deploy and rollback
 
-Until `deploy.yaml` exists, deploy by hand from `backend/` after `npm run validate`:
+Releases follow the Listly flow. From a clean `main` that passed CI:
 
 ```text
-npx wrangler deploy
-curl -s https://aquarium.bwinkeler.com/health/ready
+npm version X.Y.Z --workspaces --include-workspace-root --no-git-tag-version
+git commit -am "chore(release): bump version to X.Y.Z"
+git tag -a vX.Y.Z -m "vX.Y.Z"
+git push origin main vX.Y.Z
 ```
 
-The first deploy creates the Custom Domain and its certificate. Roll back with
+The tag starts `.github/workflows/deploy.yaml` in the `production` environment: it checks that the
+tag matches `package.json`, runs `npm run validate`, deploys with `wrangler deploy` (the Worker
+version is tagged with the release) and waits for `/health/ready`. A manual deploy from `backend/`
+after `npm run validate` (`npx wrangler deploy`) remains possible with the local OAuth login.
+
+The first deploy created the Custom Domain and its certificate. Roll back with
 `npx wrangler rollback` (list candidates with `npx wrangler versions list`). SQL migrations are
 forward-only, so never roll back across a schema change; ship a new forward migration instead.
 

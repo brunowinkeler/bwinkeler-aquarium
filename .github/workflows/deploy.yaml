@@ -1,0 +1,53 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: aquarium-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag against package.json
+        run: |
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag '${GITHUB_REF_NAME}' is not vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          version="$(node -p "require('./package.json').version")"
+          if [[ "v${version}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version ${version}" >&2
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate
+        run: npm run validate
+
+      - name: Deploy the Worker
+        working-directory: backend
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler deploy --tag "${GITHUB_REF_NAME}" --message "${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
+
+      - name: Check readiness
+        run: curl -fsS --retry 6 --retry-delay 10 --retry-all-errors https://aquarium.bwinkeler.com/health/ready

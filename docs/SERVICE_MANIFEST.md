@@ -93,7 +93,8 @@ Bindings: `AQUARIUMS`, `JOIN_CODES`, `REGISTRY` (Durable Objects), `IMAGES` (R2)
 ## Deploy
 
 - CI workflow: `.github/workflows/ci.yaml` (`npm run validate`)
-- Deployment workflow: planned `deploy.yaml` on `v*` tags in the `production` environment
+- Deployment workflow: `.github/workflows/deploy.yaml` on `vX.Y.Z` tags in the `production`
+  environment (validate, `wrangler deploy`, readiness check)
 - Release identifier: `vX.Y.Z` tag and the Worker version ID
 - Migration order: Durable Object class migrations deploy with the Worker; SQL migrations run
   when each object starts
