@@ -80,7 +80,10 @@ after `npm run validate` (`npx wrangler deploy`) remains possible with the local
 
 After a deploy, run the end-to-end suite against production:
 `E2E_BASE_URL=https://aquarium.bwinkeler.com npm run test:e2e`. It creates two short-lived
-aquariums and ends them, like real sessions.
+aquariums and ends them, like real sessions. Both count toward the daily quota of the machine's
+IP (`CREATIONS_PER_IP_PER_DAY`, 10 per UTC day), which a TV on the same network shares: a few
+runs in one day lock that TV out of new aquariums until midnight UTC, unless `IP_HASH_KEY` is
+rotated (see below).
 
 The first deploy created the Custom Domain and its certificate. Roll back with
 `npx wrangler rollback` (list candidates with `npx wrangler versions list`). SQL migrations are
