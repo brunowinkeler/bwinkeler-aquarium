@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 297 210">
+<title>Aquário: Modelo: caranguejo</title>
+<rect width="297" height="210" fill="#fff"/>
+<rect x="10" y="42" width="277" height="126" rx="6" fill="none" stroke="#4a90c8" stroke-width="0.8"/>
+<path d="M10 10h28v3.5h-28zM10 13.5h3.5v3.5h-3.5zM17 13.5h3.5v3.5h-3.5zM27.5 13.5h3.5v3.5h-3.5zM34.5 13.5h3.5v3.5h-3.5zM10 17h10.5v3.5h-10.5zM24 17h14v3.5h-14zM10 20.5h3.5v3.5h-3.5zM17 20.5h3.5v3.5h-3.5zM24 20.5h7v3.5h-7zM34.5 20.5h3.5v3.5h-3.5zM10 24h10.5v3.5h-10.5zM24 24h7v3.5h-7zM34.5 24h3.5v3.5h-3.5zM10 27.5h3.5v3.5h-3.5zM27.5 27.5h10.5v3.5h-10.5zM10 31h3.5v3.5h-3.5zM17 31h7v3.5h-7zM34.5 31h3.5v3.5h-3.5zM10 34.5h28v3.5h-28zM259 10h28v3.5h-28zM259 13.5h10.5v3.5h-10.5zM273 13.5h3.5v3.5h-3.5zM283.5 13.5h3.5v3.5h-3.5zM259 17h3.5v3.5h-3.5zM266 17h7v3.5h-7zM276.5 17h10.5v3.5h-10.5zM259 20.5h3.5v3.5h-3.5zM273 20.5h14v3.5h-14zM259 24h7v3.5h-7zM269.5 24h7v3.5h-7zM280 24h7v3.5h-7zM259 27.5h3.5v3.5h-3.5zM266 27.5h21v3.5h-21zM259 31h3.5v3.5h-3.5zM273 31h3.5v3.5h-3.5zM283.5 31h3.5v3.5h-3.5zM259 34.5h28v3.5h-28zM259 172h28v3.5h-28zM259 175.5h7v3.5h-7zM280 175.5h7v3.5h-7zM259 179h10.5v3.5h-10.5zM273 179h3.5v3.5h-3.5zM283.5 179h3.5v3.5h-3.5zM259 182.5h14v3.5h-14zM283.5 182.5h3.5v3.5h-3.5zM259 186h3.5v3.5h-3.5zM269.5 186h7v3.5h-7zM280 186h7v3.5h-7zM259 189.5h3.5v3.5h-3.5zM280 189.5h7v3.5h-7zM259 193h3.5v3.5h-3.5zM266 193h3.5v3.5h-3.5zM273 193h14v3.5h-14zM259 196.5h28v3.5h-28zM10 172h28v3.5h-28zM10 175.5h10.5v3.5h-10.5zM24 175.5h7v3.5h-7zM34.5 175.5h3.5v3.5h-3.5zM10 179h3.5v3.5h-3.5zM27.5 179h3.5v3.5h-3.5zM34.5 179h3.5v3.5h-3.5zM10 182.5h10.5v3.5h-10.5zM27.5 182.5h3.5v3.5h-3.5zM34.5 182.5h3.5v3.5h-3.5zM10 186h10.5v3.5h-10.5zM34.5 186h3.5v3.5h-3.5zM10 189.5h7v3.5h-7zM20.5 189.5h3.5v3.5h-3.5zM27.5 189.5h3.5v3.5h-3.5zM34.5 189.5h3.5v3.5h-3.5zM10 193h3.5v3.5h-3.5zM31 193h7v3.5h-7zM10 196.5h28v3.5h-28z" fill="#000" shape-rendering="crispEdges"/>
+<g font-family="Helvetica, Arial, sans-serif">
+<text x="44" y="22" font-size="9" font-weight="700" fill="#0b3d5c">Aquário</text>
+<text x="44" y="32" font-size="4.6" fill="#333333">Desenhe uma criatura do mar dentro da moldura.</text>
+<text x="44" y="186" font-size="6.5" font-weight="700" fill="#0b3d5c">Modelo: caranguejo</text>
+<text x="44" y="195" font-size="4.2" fill="#333333">Não pinte os quadrados pretos dos cantos.</text>
+</g>
+</svg>

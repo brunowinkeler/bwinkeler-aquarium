@@ -26,6 +26,11 @@ jobs:
           npm run icons
           git diff --exit-code frontend/public/icons
 
+      - name: Verify that the committed templates are reproducible
+        run: |
+          npm run templates
+          git diff --exit-code frontend/public/templates
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 

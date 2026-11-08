@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 297 210">
+<title>Aquarium: Template: jellyfish</title>
+<rect width="297" height="210" fill="#fff"/>
+<rect x="10" y="42" width="277" height="126" rx="6" fill="none" stroke="#4a90c8" stroke-width="0.8"/>
+<path d="M10 10h28v3.5h-28zM10 13.5h28v3.5h-28zM10 17h10.5v3.5h-10.5zM24 17h14v3.5h-14zM10 20.5h3.5v3.5h-3.5zM27.5 20.5h10.5v3.5h-10.5zM10 24h3.5v3.5h-3.5zM20.5 24h3.5v3.5h-3.5zM27.5 24h10.5v3.5h-10.5zM10 27.5h7v3.5h-7zM20.5 27.5h3.5v3.5h-3.5zM27.5 27.5h10.5v3.5h-10.5zM10 31h17.5v3.5h-17.5zM34.5 31h3.5v3.5h-3.5zM10 34.5h28v3.5h-28zM259 10h28v3.5h-28zM259 13.5h3.5v3.5h-3.5zM266 13.5h10.5v3.5h-10.5zM283.5 13.5h3.5v3.5h-3.5zM259 17h3.5v3.5h-3.5zM266 17h3.5v3.5h-3.5zM273 17h3.5v3.5h-3.5zM280 17h7v3.5h-7zM259 20.5h7v3.5h-7zM269.5 20.5h10.5v3.5h-10.5zM283.5 20.5h3.5v3.5h-3.5zM259 24h3.5v3.5h-3.5zM266 24h10.5v3.5h-10.5zM280 24h7v3.5h-7zM259 27.5h3.5v3.5h-3.5zM273 27.5h3.5v3.5h-3.5zM283.5 27.5h3.5v3.5h-3.5zM259 31h10.5v3.5h-10.5zM280 31h7v3.5h-7zM259 34.5h28v3.5h-28zM259 172h28v3.5h-28zM259 175.5h3.5v3.5h-3.5zM273 175.5h3.5v3.5h-3.5zM280 175.5h7v3.5h-7zM259 179h3.5v3.5h-3.5zM266 179h3.5v3.5h-3.5zM276.5 179h10.5v3.5h-10.5zM259 182.5h10.5v3.5h-10.5zM273 182.5h3.5v3.5h-3.5zM280 182.5h7v3.5h-7zM259 186h3.5v3.5h-3.5zM280 186h7v3.5h-7zM259 189.5h7v3.5h-7zM276.5 189.5h3.5v3.5h-3.5zM283.5 189.5h3.5v3.5h-3.5zM259 193h3.5v3.5h-3.5zM266 193h3.5v3.5h-3.5zM276.5 193h3.5v3.5h-3.5zM283.5 193h3.5v3.5h-3.5zM259 196.5h28v3.5h-28zM10 172h28v3.5h-28zM10 175.5h14v3.5h-14zM31 175.5h7v3.5h-7zM10 179h3.5v3.5h-3.5zM17 179h3.5v3.5h-3.5zM34.5 179h3.5v3.5h-3.5zM10 182.5h7v3.5h-7zM24 182.5h14v3.5h-14zM10 186h7v3.5h-7zM20.5 186h3.5v3.5h-3.5zM27.5 186h3.5v3.5h-3.5zM34.5 186h3.5v3.5h-3.5zM10 189.5h3.5v3.5h-3.5zM20.5 189.5h10.5v3.5h-10.5zM34.5 189.5h3.5v3.5h-3.5zM10 193h14v3.5h-14zM27.5 193h10.5v3.5h-10.5zM10 196.5h28v3.5h-28z" fill="#000" shape-rendering="crispEdges"/>
+<g font-family="Helvetica, Arial, sans-serif">
+<text x="44" y="22" font-size="9" font-weight="700" fill="#0b3d5c">Aquarium</text>
+<text x="44" y="32" font-size="4.6" fill="#333333">Draw a sea creature inside the frame.</text>
+<text x="44" y="186" font-size="6.5" font-weight="700" fill="#0b3d5c">Template: jellyfish</text>
+<text x="44" y="195" font-size="4.2" fill="#333333">Do not color the black squares in the corners.</text>
+</g>
+</svg>

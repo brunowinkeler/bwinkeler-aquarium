@@ -26,6 +26,7 @@
     "test": "npm run build:libs && npm run test --workspaces --if-present",
     "test:e2e": "playwright test",
     "icons": "node scripts/generate-icons.mjs",
+    "templates": "npm run build -w @bwinkeler-aquarium/extractor && node scripts/generate-templates.mjs",
     "check:es5": "es-check es5 \"spikes/tv-spike/*.js\"",
     "check:tv": "es-check es2016 frontend/dist/tv/tv.js",
     "validate": "npm run format && npm run lint && npm run typecheck && npm run build && npm run test && npm run check:es5 && npm run check:tv",
