@@ -100,6 +100,7 @@ h1 {
 .header__language {
   min-width: 3rem;
   min-height: 2.75rem;
+  padding: 0 0.9rem;
   border: 2px solid rgb(255 255 255 / 0.6);
   border-radius: 999px;
   background: transparent;

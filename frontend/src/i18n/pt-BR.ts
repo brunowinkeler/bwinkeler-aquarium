@@ -1,7 +1,6 @@
 export const ptBR = {
   'app.name': 'Aquário',
-  'app.languageSwitch': 'EN',
-  'app.languageSwitchLabel': 'Mudar para inglês',
+  'app.languageSwitch': 'English',
   'app.skipToContent': 'Pular para o conteúdo',
 
   'common.back': 'Voltar',

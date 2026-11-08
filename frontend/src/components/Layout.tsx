@@ -37,7 +37,7 @@ export function Layout() {
         <button
           type="button"
           className="header__language"
-          aria-label={t('app.languageSwitchLabel')}
+          lang={language === 'pt-BR' ? 'en' : 'pt-BR'}
           onClick={() => setLanguage(language === 'pt-BR' ? 'en' : 'pt-BR')}
         >
           {t('app.languageSwitch')}

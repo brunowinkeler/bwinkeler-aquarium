@@ -2,8 +2,7 @@ import type { Messages } from './pt-BR';
 
 export const en: Messages = {
   'app.name': 'Aquarium',
-  'app.languageSwitch': 'PT',
-  'app.languageSwitchLabel': 'Switch to Portuguese',
+  'app.languageSwitch': 'Português',
   'app.skipToContent': 'Skip to content',
 
   'common.back': 'Back',

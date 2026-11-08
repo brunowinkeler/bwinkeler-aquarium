@@ -235,13 +235,11 @@ export function CreatePage() {
     const message = shown ? 'send.shown' : tvOnline ? 'send.waitingDisplay' : 'send.waitingTv';
     return (
       <section className="page sent" aria-labelledby="sent-title">
-        <h1
-          id="sent-title"
-          className={shown ? 'sent__title sent__title--shown' : 'sent__title'}
-          role="status"
-        >
-          {t(message)}
-        </h1>
+        <div role="status">
+          <h1 id="sent-title" className={shown ? 'sent__title sent__title--shown' : 'sent__title'}>
+            {t(message)}
+          </h1>
+        </div>
         <Link to="/" className="button button--primary button--large">
           {t('send.another')}
         </Link>
