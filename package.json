@@ -10,15 +10,17 @@
   },
   "workspaces": [
     "shared",
+    "engine",
     "backend"
   ],
   "scripts": {
-    "build": "npm run build -w @bwinkeler-aquarium/shared && npm run build -w @bwinkeler-aquarium/backend",
-    "typecheck": "npm run build -w @bwinkeler-aquarium/shared && npm run typecheck --workspaces --if-present",
+    "build:libs": "npm run build -w @bwinkeler-aquarium/shared && npm run build -w @bwinkeler-aquarium/engine",
+    "build": "npm run build:libs && npm run build -w @bwinkeler-aquarium/backend",
+    "typecheck": "npm run build:libs && npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "test": "npm run build -w @bwinkeler-aquarium/shared && npm run test --workspaces --if-present",
+    "test": "npm run build:libs && npm run test --workspaces --if-present",
     "check:es5": "es-check es5 \"spikes/tv-spike/*.js\"",
     "validate": "npm run format && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:es5",
     "spike:tv:package": "ares-package --no-minify --outdir spikes/out spikes/tv-spike",
