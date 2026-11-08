@@ -16,7 +16,8 @@ async function openTv(browser: Browser): Promise<{ tv: Page; code: string }> {
   await tv.goto('/tv/');
   await tv.getByRole('button', { name: 'Novo aquário' }).click();
   const code = tv.getByTestId('join-code');
-  await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/);
+  // Creation can wait on a cold Worker and Durable Objects when run against production.
+  await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/, { timeout: 20_000 });
   return { tv, code: (await code.textContent()) ?? '' };
 }
 
@@ -142,7 +143,7 @@ test('the /pc/ page is driven with clicks', async ({ browser }) => {
   await pc.goto('/pc/');
   await pc.getByRole('button', { name: 'Novo aquário' }).click();
   const code = pc.getByTestId('join-code');
-  await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/);
+  await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/, { timeout: 20_000 });
   expect((await tvStatus(pc)).pointer).toBe(true);
 
   await pc.getByRole('button', { name: 'Fechar' }).click();
