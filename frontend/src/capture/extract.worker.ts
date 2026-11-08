@@ -1,4 +1,9 @@
-import { detectPaperQuad, extractCreature, type RgbaImage } from '@bwinkeler-aquarium/extractor';
+import {
+  detectPaperQuad,
+  detectTemplate,
+  extractCreature,
+  type RgbaImage,
+} from '@bwinkeler-aquarium/extractor';
 import type { WorkerReply, WorkerRequest } from './client';
 
 const scope = self as unknown as {
@@ -17,12 +22,16 @@ scope.onmessage = (event) => {
         height: request.height,
         data: new Uint8ClampedArray(request.buffer),
       };
-      const detection = detectPaperQuad(photo);
+      const template = detectTemplate(photo);
+      const detection = template
+        ? { quad: template.quad, confident: true }
+        : detectPaperQuad(photo);
       scope.postMessage({
         type: 'detected',
         id: request.id,
         quad: detection.quad,
         confident: detection.confident,
+        template: template?.kind ?? null,
       });
       return;
     }

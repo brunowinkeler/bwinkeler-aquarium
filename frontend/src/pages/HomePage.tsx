@@ -84,6 +84,9 @@ export function HomePage() {
       <Link to="/creatures" className="button">
         {t('home.list')}
       </Link>
+      <Link to="/templates" className="button">
+        {t('templates.link')}
+      </Link>
       {error && (
         <p className="error" role="alert">
           {t(error)}

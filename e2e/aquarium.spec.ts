@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { devices, expect, test, type Browser, type Page } from '@playwright/test';
-import { drawingPhoto, tvStatus } from './support';
+import { drawingPhoto, templatePhoto, tvStatus } from './support';
 
 async function expectAccessible(page: Page): Promise<void> {
   const results = await new AxeBuilder({ page }).analyze();
@@ -70,6 +70,27 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await expect(phone.getByRole('listitem')).toHaveCount(1);
   await expect(phone.getByText('por Olivia')).toBeVisible();
   await expectAccessible(phone);
+
+  // A photographed printed template skips the corners and picks the kind.
+  await phone.goto('/');
+  await phone.getByRole('link', { name: 'Modelos para imprimir' }).click();
+  await expect(phone.getByRole('heading', { name: 'Modelos para imprimir' })).toBeVisible();
+  await expect(phone.getByRole('link', { name: /Baixar PDF/ })).toHaveCount(5);
+  await expectAccessible(phone);
+  await phone.getByRole('link', { name: 'Voltar' }).click();
+  await phone.getByTestId('gallery-input').setInputFiles({
+    name: 'template.png',
+    mimeType: 'image/png',
+    buffer: await templatePhoto(phone, '/templates/pt-BR/walk.svg'),
+  });
+  await expect(
+    phone.getByText('Modelo reconhecido: os cantos foram encontrados sozinhos.'),
+  ).toBeVisible();
+  await expect(phone.getByRole('img', { name: 'Prévia animada da criatura' })).toBeVisible();
+  await expect(phone.getByRole('radio', { name: 'Caranguejo' })).toBeChecked();
+  await phone.getByRole('button', { name: 'Enviar para a TV' }).click();
+  await expect(phone.getByText('Já está nadando na TV!')).toBeVisible({ timeout: 20_000 });
+  await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(2);
 
   await tv.keyboard.press('Escape');
   await tv.getByRole('button', { name: 'Encerrar aquário' }).click();

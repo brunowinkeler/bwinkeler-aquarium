@@ -4,6 +4,7 @@ import { CreatePage } from './pages/CreatePage';
 import { CreaturesPage } from './pages/CreaturesPage';
 import { HomePage } from './pages/HomePage';
 import { JoinPage } from './pages/JoinPage';
+import { TemplatesPage } from './pages/TemplatesPage';
 import { useI18n } from './i18n';
 import { useSession } from './session';
 
@@ -36,6 +37,7 @@ export function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/join" element={<JoinPage />} />
+        <Route path="/templates" element={<TemplatesPage />} />
         <Route element={<RequireSession />}>
           <Route index element={<HomePage />} />
           <Route path="/new" element={<CreatePage />} />

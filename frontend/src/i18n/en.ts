@@ -65,6 +65,7 @@ export const en: Messages = {
   'processing.text': 'Separating the drawing from the paper…',
 
   'preview.title': 'Preview',
+  'preview.template': 'Template recognized: the corners were found automatically.',
   'preview.canvasLabel': 'Animated preview of the creature',
   'preview.empty':
     'No drawing was found. Raise the sensitivity, adjust the corners or take another photo.',
@@ -84,6 +85,14 @@ export const en: Messages = {
   'kind.pulse': 'Jellyfish',
   'kind.walk': 'Crab',
   'kind.glide': 'Turtle',
+
+  'templates.link': 'Printable templates',
+  'templates.title': 'Printable templates',
+  'templates.intro':
+    'Print on A4 paper in landscape. When you photograph a template, the app finds the corners by itself and picks the creature kind.',
+  'templates.tip': 'Draw inside the frame and do not color the black squares in the corners.',
+  'templates.generic': 'Any creature',
+  'templates.pdf': 'Download PDF',
 
   'send.sending': 'Sending to the TV…',
   'send.waitingDisplay': 'Sent! Waiting for it to appear on the TV…',

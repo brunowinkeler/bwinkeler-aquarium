@@ -63,6 +63,7 @@ export const ptBR = {
   'processing.text': 'Separando o desenho do papel…',
 
   'preview.title': 'Prévia',
+  'preview.template': 'Modelo reconhecido: os cantos foram encontrados sozinhos.',
   'preview.canvasLabel': 'Prévia animada da criatura',
   'preview.empty':
     'Não encontramos um desenho. Aumente a sensibilidade, ajuste os cantos ou tire outra foto.',
@@ -82,6 +83,14 @@ export const ptBR = {
   'kind.pulse': 'Água-viva',
   'kind.walk': 'Caranguejo',
   'kind.glide': 'Tartaruga',
+
+  'templates.link': 'Modelos para imprimir',
+  'templates.title': 'Modelos para imprimir',
+  'templates.intro':
+    'Imprima numa folha A4, na horizontal. Ao fotografar um modelo, o app encontra os cantos sozinho e já escolhe o tipo da criatura.',
+  'templates.tip': 'Desenhe dentro da moldura e não pinte os quadrados pretos dos cantos.',
+  'templates.generic': 'Qualquer criatura',
+  'templates.pdf': 'Baixar PDF',
 
   'send.sending': 'Enviando para a TV…',
   'send.waitingDisplay': 'Enviado! Esperando aparecer na TV…',

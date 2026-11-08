@@ -1,6 +1,6 @@
 import { normalizeJoinCode } from '@bwinkeler-aquarium/shared';
 import { useState, type FormEvent } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { api, ApiError, errorMessageKey } from '../api';
 import { codeFromQr, QrScanner } from '../components/QrScanner';
 import { useI18n, type MessageKey } from '../i18n';
@@ -113,6 +113,9 @@ export function JoinPage() {
           {t('join.scan')}
         </button>
       )}
+      <Link to="/templates" className="button button--quiet">
+        {t('templates.link')}
+      </Link>
     </section>
   );
 }

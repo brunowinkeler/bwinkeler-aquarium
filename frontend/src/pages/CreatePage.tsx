@@ -1,4 +1,8 @@
-import { DEFAULT_EXTRACT_OPTIONS, type Quad } from '@bwinkeler-aquarium/extractor';
+import {
+  DEFAULT_EXTRACT_OPTIONS,
+  type Quad,
+  type TemplateKind,
+} from '@bwinkeler-aquarium/extractor';
 import {
   CREATURE_KINDS,
   createUlid,
@@ -25,6 +29,12 @@ interface Adjustments {
   closeOutlines: number;
   includeLooseParts: boolean;
 }
+
+const INITIAL_ADJUSTMENTS: Adjustments = {
+  sensitivity: DEFAULT_EXTRACT_OPTIONS.sensitivity,
+  closeOutlines: DEFAULT_EXTRACT_OPTIONS.closeOutlines,
+  includeLooseParts: DEFAULT_EXTRACT_OPTIONS.includeLooseParts,
+};
 
 const POLL_MS = 1500;
 const POLL_ATTEMPTS = 40;
@@ -55,11 +65,8 @@ export function CreatePage() {
   const [photo, setPhoto] = useState<HTMLCanvasElement | null>(null);
   const [detected, setDetected] = useState<Quad | null>(null);
   const [quad, setQuad] = useState<Quad | null>(null);
-  const [adjustments, setAdjustments] = useState<Adjustments>({
-    sensitivity: DEFAULT_EXTRACT_OPTIONS.sensitivity,
-    closeOutlines: DEFAULT_EXTRACT_OPTIONS.closeOutlines,
-    includeLooseParts: DEFAULT_EXTRACT_OPTIONS.includeLooseParts,
-  });
+  const [template, setTemplate] = useState<TemplateKind | null>(null);
+  const [adjustments, setAdjustments] = useState<Adjustments>(INITIAL_ADJUSTMENTS);
   const [extracted, setExtracted] = useState<Extracted | null>(null);
   const [refining, setRefining] = useState(false);
   const [id, setId] = useState(() => createUlid());
@@ -83,7 +90,18 @@ export function CreatePage() {
         setPhoto(decoded.canvas);
         setDetected(detection.quad);
         setQuad(detection.quad);
-        setStep('corners');
+        if (!detection.template) {
+          setStep('corners');
+          return;
+        }
+        // A printed template fixes the corners, and maybe the kind: straight to the preview.
+        setTemplate(detection.template);
+        if (detection.template !== 'generic') setKind(detection.template);
+        setStep('processing');
+        const result = await extractor.extract(detection.quad, INITIAL_ADJUSTMENTS);
+        if (cancelled) return;
+        setExtracted(result);
+        setStep('preview');
       } catch {
         if (cancelled) return;
         setError('create.decodeError');
@@ -275,6 +293,7 @@ export function CreatePage() {
   return (
     <section className="page preview" aria-labelledby="preview-title">
       <h1 id="preview-title">{t('preview.title')}</h1>
+      {template && <p className="hint">{t('preview.template')}</p>}
       {image ? (
         <PreviewStage
           id={id}

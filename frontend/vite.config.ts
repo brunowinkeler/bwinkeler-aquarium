@@ -53,10 +53,16 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,pdf}'],
         globIgnores: ['tv/**'],
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/ws\//, /^\/health\//, /^\/tv(\/|$)/],
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          /^\/ws\//,
+          /^\/health\//,
+          /^\/tv(\/|$)/,
+          /^\/templates\//,
+        ],
         cleanupOutdatedCaches: true,
         clientsClaim: false,
         skipWaiting: false,

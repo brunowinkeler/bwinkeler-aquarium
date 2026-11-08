@@ -89,6 +89,39 @@ export function drawingPhoto(): Buffer {
   });
 }
 
+/**
+ * A photo of the served template at `url` with an orange crab drawn in its frame, taken
+ * upside down and slightly turned. Rendered in the page, so it uses the real SVG.
+ */
+export async function templatePhoto(page: Page, url: string): Promise<Buffer> {
+  const dataUrl = await page.evaluate(async (source) => {
+    const image = new Image();
+    image.src = source;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 900;
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = 'rgb(112, 92, 76)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    // From here on the units are template millimetres.
+    context.translate(600, 450);
+    context.rotate(Math.PI + 0.1);
+    context.scale(1000 / 297, 1000 / 297);
+    context.translate(-297 / 2, -210 / 2);
+    context.drawImage(image, 0, 0, 297, 210);
+    context.fillStyle = 'rgb(255, 138, 61)';
+    context.strokeStyle = 'rgb(40, 40, 52)';
+    context.lineWidth = 1.2;
+    context.beginPath();
+    context.ellipse(148, 105, 45, 28, 0, 0, Math.PI * 2);
+    context.fill();
+    context.stroke();
+    return canvas.toDataURL('image/png');
+  }, url);
+  return Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64');
+}
+
 export interface TvStatus {
   screen: string;
   aquariumId: string | null;

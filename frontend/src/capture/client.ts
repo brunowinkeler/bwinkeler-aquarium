@@ -1,11 +1,11 @@
-import type { ExtractOptions, Quad } from '@bwinkeler-aquarium/extractor';
+import type { ExtractOptions, Quad, TemplateKind } from '@bwinkeler-aquarium/extractor';
 
 export type WorkerRequest =
   | { type: 'load'; id: number; width: number; height: number; buffer: ArrayBuffer }
   | { type: 'extract'; id: number; quad: Quad; options: ExtractOptions };
 
 export type WorkerReply =
-  | { type: 'detected'; id: number; quad: Quad; confident: boolean }
+  | { type: 'detected'; id: number; quad: Quad; confident: boolean; template: TemplateKind | null }
   | {
       type: 'extracted';
       id: number;
@@ -22,6 +22,13 @@ export interface Extracted {
   height: number;
   data: Uint8ClampedArray;
   coverage: number;
+}
+
+export interface Detection {
+  quad: Quad;
+  confident: boolean;
+  /** Set when the photo shows a printed template; its quad is then exact. */
+  template: TemplateKind | null;
 }
 
 type Pending = { resolve: (reply: WorkerReply) => void; reject: (error: Error) => void };
@@ -56,15 +63,15 @@ export class ExtractorClient {
     this.pending.clear();
   }
 
-  /** Hands the photo to the worker and returns the detected sheet corners. */
-  async load(pixels: ImageData): Promise<{ quad: Quad; confident: boolean }> {
+  /** Hands the photo to the worker and returns the template or sheet corners it found. */
+  async load(pixels: ImageData): Promise<Detection> {
     const buffer = pixels.data.buffer as ArrayBuffer;
     const reply = await this.call(
       { type: 'load', id: this.next++, width: pixels.width, height: pixels.height, buffer },
       [buffer],
     );
     if (reply.type !== 'detected') throw new Error('Unexpected worker reply');
-    return { quad: reply.quad, confident: reply.confident };
+    return { quad: reply.quad, confident: reply.confident, template: reply.template };
   }
 
   async extract(quad: Quad, options: ExtractOptions): Promise<Extracted | null> {
