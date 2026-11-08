@@ -20,3 +20,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run validate
+
+      - name: Verify that the committed icons are reproducible
+        run: |
+          npm run icons
+          git diff --exit-code frontend/public/icons
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the end-to-end tests (PWA, Worker and /tv/ through wrangler dev)
+        run: npm run test:e2e
+
+      - name: Upload the Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-traces
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7

@@ -39,6 +39,7 @@ npm ci
 npm run validate                                   # format, lint, typecheck, build, tests, es-check
 npm run build && npm run dev -w @bwinkeler-aquarium/backend   # PWA + Worker on http://localhost:8787
 npm run dev -w @bwinkeler-aquarium/frontend        # PWA with hot reload, proxied to the Worker
+npm run test:e2e                                   # PWA + Worker + /tv/ in Chromium (after build)
 npm run icons                                      # regenerate the PWA icons
 npm run spike:tv:package && npm run spike:tv:install
 ```

@@ -30,10 +30,17 @@ without a `backend/.dev.vars` file present, so the committed types do not depend
 
 ## Validation
 
-`npm run validate` runs Prettier, ESLint, both TypeScript projects of each workspace, the unit tests
-(`shared` in Node, `backend` inside the Workers runtime through `@cloudflare/vitest-plugin`), the
-Worker bundle (`wrangler deploy --dry-run`) and `es-check es5` on the TV spike. CI runs the same
-command on every push to `main` and on pull requests.
+`npm run validate` runs Prettier, ESLint, the TypeScript projects of every workspace and of the
+end-to-end tests, the builds (libraries, PWA, TV bundle, Worker with `wrangler deploy --dry-run`),
+the unit tests (`shared`, `engine` and `extractor` in Node, `backend` inside the Workers runtime
+through `@cloudflare/vitest-plugin`), `es-check es5` on the TV spike and `es-check es2016` on the TV
+bundle.
+
+`npm run test:e2e` (after `npm run build`) starts a clean local Worker (`dev:e2e`, port 8787) and
+drives the whole flow in Chromium: the TV at `/tv/` creates an aquarium, a phone joins with the code,
+sends a photographed drawing, sees it confirmed on the TV and lists it, then the TV ends the
+aquarium; axe checks the phone screens. CI runs `validate`, checks that the icons are reproducible
+and runs the end-to-end tests on every push to `main` and on pull requests.
 
 ## Cloudflare resources (one-time, manual)
 
