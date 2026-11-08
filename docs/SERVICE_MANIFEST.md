@@ -16,7 +16,9 @@
 - VPS dependency: none; Caddy route: none
 - API prefix: `/api` (phone, same origin) and `/api/tv` (TV, CORS `*`, bearer token)
 - WebSocket path: `/ws/tv/{aquariumId}` (TV only)
-- Static assets: none yet; the PWA and the `/tv/` browser build will be served by the same Worker
+- Static assets: the PWA built in `frontend/dist`, served by the same Worker (Workers static assets
+  with the single-page-application fallback; the Worker runs first for `/api/*`, `/ws/*` and
+  `/health/*`); headers in `frontend/public/_headers`
 - TV client: packaged webOS app `com.bwinkeler.aquarium`, installed in Developer Mode (ADR 002)
 
 ## Containers

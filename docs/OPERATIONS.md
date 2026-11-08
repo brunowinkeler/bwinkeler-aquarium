@@ -5,12 +5,16 @@
 ```text
 npm ci
 cp backend/.dev.vars.example backend/.dev.vars
+npm run build
 npm run dev -w @bwinkeler-aquarium/backend
 ```
 
 `wrangler dev` runs the Worker, the three Durable Objects, R2 and the rate limiters locally on
-`http://localhost:8787`; nothing needs the Cloudflare account. Local state lives in
-`backend/.wrangler/` and can be deleted at any time. A quick check:
+`http://localhost:8787`, and serves the built PWA from `frontend/dist` (so build first); nothing
+needs the Cloudflare account. For hot reload while working on the PWA, keep `wrangler dev` running
+and start `npm run dev -w @bwinkeler-aquarium/frontend`: Vite proxies `/api`, `/ws` and `/health`
+to the Worker. Local state lives in `backend/.wrangler/` and can be deleted at any time. A quick
+check:
 
 ```text
 curl -s http://localhost:8787/health/ready

@@ -1,7 +1,10 @@
 node_modules/
 dist/
+dev-dist/
 build/
 coverage/
+playwright-report/
+test-results/
 *.log
 npm-debug.log*
 .env

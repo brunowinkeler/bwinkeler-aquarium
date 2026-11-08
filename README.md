@@ -13,9 +13,10 @@ the creature to the TV, where it swims in an animated aquarium.
 | `shared`: protocol, limits, identifiers       | Implemented                                  |
 | `engine`: creature motion, Canvas 2D renderer | Implemented (WebGL renderer after the spike) |
 | `extractor`: paper removal on the phone       | Implemented (ArUco templates pending)        |
+| `frontend`: phone PWA (join, photo, preview)  | Implemented, served by the Worker            |
 | `backend`: Worker, Durable Objects, R2        | Deployed by hand to `aquarium.bwinkeler.com` |
 | `spikes/tv-spike`: webOS 4 feasibility app    | Ready to run on the TV                       |
-| `engine`, `extractor`, `tv`, `frontend` (PWA) | Planned                                      |
+| `tv`: TV app                                  | Planned                                      |
 
 ## Repository layout
 
@@ -23,6 +24,7 @@ the creature to the TV, where it swims in an animated aquarium.
 shared/           Protocol types, TV-safe guards, Zod schemas (shared/schemas), limits
 engine/           Creature motion and rendering shared by the phone preview and the TV
 extractor/        Paper detection, rectification and drawing segmentation (no AI)
+frontend/         Phone PWA (React): join, photo, corners, animated preview, send
 backend/          Cloudflare Worker, AquariumDO, JoinCodeDO, RegistryDO, tests
 spikes/tv-spike/  Throwaway ES5 webOS app for the Phase 0 measurements
 scripts/          Repository tooling
@@ -33,8 +35,10 @@ docs/             Design, requirements, manifest, operations, ADRs, platform con
 
 ```text
 npm ci
-npm run validate                                   # format, lint, typecheck, tests, build, es-check
-npm run dev -w @bwinkeler-aquarium/backend         # local Worker on http://localhost:8787
+npm run validate                                   # format, lint, typecheck, build, tests, es-check
+npm run build && npm run dev -w @bwinkeler-aquarium/backend   # PWA + Worker on http://localhost:8787
+npm run dev -w @bwinkeler-aquarium/frontend        # PWA with hot reload, proxied to the Worker
+npm run icons                                      # regenerate the PWA icons
 npm run spike:tv:package && npm run spike:tv:install
 ```
 
