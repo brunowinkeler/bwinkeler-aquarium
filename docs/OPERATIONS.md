@@ -66,10 +66,17 @@ git tag -a vX.Y.Z -m "vX.Y.Z"
 git push origin main vX.Y.Z
 ```
 
+If `npm version` rewrites `package-lock.json` beyond the version fields (it reifies the local
+`node_modules`), restore the file and run `npm install --package-lock-only` before committing.
+
 The tag starts `.github/workflows/deploy.yaml` in the `production` environment: it checks that the
 tag matches `package.json`, runs `npm run validate`, deploys with `wrangler deploy` (the Worker
 version is tagged with the release) and waits for `/health/ready`. A manual deploy from `backend/`
 after `npm run validate` (`npx wrangler deploy`) remains possible with the local OAuth login.
+
+After a deploy, run the end-to-end suite against production:
+`E2E_BASE_URL=https://aquarium.bwinkeler.com npm run test:e2e`. It creates one short-lived aquarium
+and ends it, like a real session.
 
 The first deploy created the Custom Domain and its certificate. Roll back with
 `npx wrangler rollback` (list candidates with `npx wrangler versions list`). SQL migrations are
