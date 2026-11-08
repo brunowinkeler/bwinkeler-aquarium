@@ -2,8 +2,8 @@
 
 Living design document for Aquarium (`service_id: aquarium`), a product of the `bwinkeler.com` platform. It follows the platform contract `BW-PLATFORM-ARCH-001` v1.3 (`bwinkeler-infra/ARCHITECTURE.md`); where the two conflict, the platform contract and its precedence rules prevail, and every deviation is listed in [5. Platform conformance](#5-platform-conformance). Platform facts were verified against official documentation and source code between 2026-11-03 and 2026-11-07.
 
-**Status:** design approved. Implemented: repository, docs and CI (Phase 1), `shared` protocol (part of Phase 2), the Worker (Phase 3, not deployed yet), and the TV spike app for Phase 0.
-**Last updated:** 2026-11-07.
+**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet; ArUco templates pending) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA (Phase 5, without the printable templates); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a procedural backdrop.
+**Last updated:** 2026-11-08.
 
 | Field             | Value                                                        |
 | ----------------- | ------------------------------------------------------------ |
