@@ -45,7 +45,8 @@ npm run templates                                  # regenerate the printable te
 npm run spike:tv:package && npm run spike:tv:install
 ```
 
-See [docs/OPERATIONS.md](docs/OPERATIONS.md) for local setup, deployment and the TV spike, and
+See [docs/USER_GUIDE.md](docs/USER_GUIDE.md) for how to use it,
+[docs/OPERATIONS.md](docs/OPERATIONS.md) for local setup, deployment and the TV spike, and
 [docs/DESIGN.md](docs/DESIGN.md) for the full design.
 
 ## License
