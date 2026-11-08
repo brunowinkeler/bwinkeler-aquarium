@@ -394,7 +394,14 @@ export class AquariumDO extends DurableObject<Env> {
     if (request.headers.get('Upgrade')?.toLowerCase() !== 'websocket') {
       return new Response('Expected a WebSocket upgrade', { status: 426 });
     }
-    if (!this.meta()) return new Response('This aquarium has ended', { status: 410 });
+    if (!this.meta()) {
+      // Browsers hide the status of a refused upgrade, so a TV could only retry forever;
+      // close code 4010 tells it that the aquarium is gone.
+      const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket];
+      server.accept();
+      server.close(WS_CLOSE.ended, 'This aquarium has ended');
+      return new Response(null, { status: 101, webSocket: client });
+    }
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair) as [WebSocket, WebSocket];
     this.ctx.acceptWebSocket(server);

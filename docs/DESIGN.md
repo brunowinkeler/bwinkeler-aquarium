@@ -675,7 +675,7 @@ WebSocket messages:
 | TV → server | `sync`             | Asks for a new `snapshot`, after a revision gap                                                              |
 | TV → server | `displayed`        | Creature `id`; sets `displayedAt` so the phone can confirm                                                   |
 
-Close codes: 4000 authentication timeout, 4001 replaced by a newer TV connection, 4003 unauthorized, 4010 aquarium ended, 1008 invalid message, 1009 message over 1 KB.
+Close codes: 4000 authentication timeout, 4001 replaced by a newer TV connection, 4003 unauthorized, 4010 aquarium ended (also sent right after the upgrade when the aquarium no longer exists, because browsers hide a refused upgrade's status), 1008 invalid message, 1009 message over 1 KB.
 
 ### 12.2 WebSocket contract
 

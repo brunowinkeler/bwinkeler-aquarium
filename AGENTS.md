@@ -22,8 +22,8 @@ English. The interfaces are bilingual, Brazilian Portuguese first (ADR 005).
 - Images go to R2, never into Durable Object storage. The Worker never decodes images.
 - Durable Object schemas change only through new forward-only entries in the `MIGRATIONS` arrays.
   New Durable Object classes need a new tag in `backend/wrangler.jsonc` `migrations`.
-- An aquarium has exactly one TV. Ended or expired aquariums must answer `410 Gone` and must never
-  be recreated by a stray request.
+- An aquarium has exactly one TV. Ended or expired aquariums must answer `410 Gone` (WebSocket
+  upgrades: close code 4010) and must never be recreated by a stray request.
 - Only `/api/tv/*` sends CORS headers. Phone routes use the session cookie and the CSRF checks.
 
 ## TV compatibility

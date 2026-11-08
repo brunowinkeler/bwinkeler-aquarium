@@ -1,6 +1,6 @@
 import { runDurableObjectAlarm, runInDurableObject } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
-import { WS_PING, type SessionResponse } from '@bwinkeler-aquarium/shared';
+import { WS_CLOSE, WS_PING, type SessionResponse } from '@bwinkeler-aquarium/shared';
 import { describe, expect, it } from 'vitest';
 import { REGISTRY_NAME } from '../src/registry-do.js';
 import {
@@ -106,8 +106,8 @@ describe('TV WebSocket', () => {
     expect((await readSession(cookie)).status).toBe(410);
     expect(await storedKeys(tv.aquariumId)).toEqual([]);
     expect(await registry.liveCount()).toBe(liveBefore - 1);
-    const reconnect = await call(`/ws/tv/${tv.aquariumId}`, { headers: { Upgrade: 'websocket' } });
-    expect(reconnect.status).toBe(410);
+    const reconnect = await openSocket(tv.aquariumId);
+    expect((await reconnect.closed()).code).toBe(WS_CLOSE.ended);
   });
 
   it('keeps the aquarium alive while the TV is connected', async () => {
