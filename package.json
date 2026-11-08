@@ -1,0 +1,41 @@
+{
+  "name": "bwinkeler-aquarium",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Aquarium (service_id: aquarium): children's paper drawings swim on a TV. Part of the bwinkeler.com platform.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "workspaces": [
+    "shared",
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run build -w @bwinkeler-aquarium/shared && npm run build -w @bwinkeler-aquarium/backend",
+    "typecheck": "npm run build -w @bwinkeler-aquarium/shared && npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test": "npm run build -w @bwinkeler-aquarium/shared && npm run test --workspaces --if-present",
+    "check:es5": "es-check es5 \"spikes/tv-spike/*.js\"",
+    "validate": "npm run format && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:es5",
+    "spike:tv:package": "ares-package --no-minify --outdir spikes/out spikes/tv-spike",
+    "spike:tv:install": "ares-install --device tv spikes/out/com.bwinkeler.aquarium.spike_0.0.1_all.ipk",
+    "spike:tv:launch": "ares-launch --device tv com.bwinkeler.aquarium.spike",
+    "spike:tv:inspect": "ares-inspect --device tv --app com.bwinkeler.aquarium.spike --open"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.1",
+    "@webos-tools/cli": "3.2.6",
+    "es-check": "9.8.1",
+    "eslint": "10.8.1",
+    "globals": "17.14.0",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.67.0",
+    "vitest": "5.1.0"
+  }
+}

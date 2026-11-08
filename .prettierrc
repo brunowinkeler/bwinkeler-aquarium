@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": "spikes/tv-spike/*.js",
+      "options": { "trailingComma": "es5" }
+    }
+  ]
+}

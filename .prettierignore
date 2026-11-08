@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+coverage
+.wrangler
+spikes/out
+**/*.tsbuildinfo
+package-lock.json
+backend/worker-configuration.d.ts
+# Verbatim copy of the platform contract; keep it byte-identical to bwinkeler-infra.
+docs/PLATFORM_ARCHITECTURE.md
