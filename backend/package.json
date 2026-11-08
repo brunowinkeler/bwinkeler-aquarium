@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --local-upstream localhost:8787",
+    "dev:e2e": "node -e \"require('node:fs').rmSync('.wrangler/e2e',{recursive:true,force:true})\" && wrangler dev --ip 127.0.0.1 --port 8787 --local-upstream 127.0.0.1:8787 --persist-to .wrangler/e2e --var PUBLIC_ORIGIN:http://127.0.0.1:8787 --var IP_HASH_KEY:e2e-only-key",
     "build": "wrangler deploy --dry-run --outdir dist",
     "typecheck": "tsc -p tsconfig.json && tsc -p test/tsconfig.json",
     "types": "wrangler types",

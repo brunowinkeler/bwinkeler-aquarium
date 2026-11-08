@@ -13,8 +13,11 @@ npm run dev -w @bwinkeler-aquarium/backend
 `http://localhost:8787`, and serves the built PWA from `frontend/dist` (so build first); nothing
 needs the Cloudflare account. For hot reload while working on the PWA, keep `wrangler dev` running
 and start `npm run dev -w @bwinkeler-aquarium/frontend`: Vite proxies `/api`, `/ws` and `/health`
-to the Worker. Local state lives in `backend/.wrangler/` and can be deleted at any time. A quick
-check:
+to the Worker. Local state lives in `backend/.wrangler/` and can be deleted at any time.
+
+The `dev` script passes `--local-upstream localhost:8787`: without it, `wrangler dev` rewrites the
+request URL and the `Origin` header to the Custom Domain, and the phone's CSRF check
+(`Origin` = `PUBLIC_ORIGIN`) rejects every state-changing request. A quick check:
 
 ```text
 curl -s http://localhost:8787/health/ready
