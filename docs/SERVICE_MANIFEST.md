@@ -105,8 +105,9 @@ Bindings: `AQUARIUMS`, `JOIN_CODES`, `REGISTRY` (Durable Objects), `IMAGES` (R2)
 
 - External services: Cloudflare Workers, Durable Objects, R2, Workers Logs, GitHub, LG Developer
   (Developer Mode)
-- Infrastructure changes required: R2 bucket, deploy token, `IP_HASH_KEY` secret, infra repository
-  entries (see `DESIGN.md` §14.4)
+- Infrastructure changes required: the deploy token, pending until `deploy.yaml` exists; the R2
+  bucket, the `IP_HASH_KEY` secret and the infra repository entries are in place (see `DESIGN.md`
+  §14.4)
 - Known portability constraints: the backend depends on Durable Objects; the TV app on webOS 4
   packaging and Developer Mode
 

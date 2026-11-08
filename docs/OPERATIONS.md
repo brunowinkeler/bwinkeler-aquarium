@@ -31,6 +31,7 @@ command on every push to `main` and on pull requests.
 ## Cloudflare resources (one-time, manual)
 
 These steps touch the shared Cloudflare account; run them only when the first deploy is approved.
+Steps 1, 2 and 4 were done for the first deploy on 2026-11-08; step 3 waits for `deploy.yaml`.
 
 1. Create the private bucket: `npx wrangler r2 bucket create bwinkeler-aquarium-files`.
 2. Set the IP hashing key from `backend/`: `npx wrangler secret put IP_HASH_KEY` with a random value

@@ -8,12 +8,12 @@ the creature to the TV, where it swims in an animated aquarium.
 
 ## Status
 
-| Part                                          | State                     |
-| --------------------------------------------- | ------------------------- |
-| `shared`: protocol, limits, identifiers       | Implemented               |
-| `backend`: Worker, Durable Objects, R2        | Implemented, not deployed |
-| `spikes/tv-spike`: webOS 4 feasibility app    | Ready to run on the TV    |
-| `engine`, `extractor`, `tv`, `frontend` (PWA) | Planned                   |
+| Part                                          | State                                        |
+| --------------------------------------------- | -------------------------------------------- |
+| `shared`: protocol, limits, identifiers       | Implemented                                  |
+| `backend`: Worker, Durable Objects, R2        | Deployed by hand to `aquarium.bwinkeler.com` |
+| `spikes/tv-spike`: webOS 4 feasibility app    | Ready to run on the TV                       |
+| `engine`, `extractor`, `tv`, `frontend` (PWA) | Planned                                      |
 
 ## Repository layout
 
