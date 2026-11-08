@@ -38,9 +38,11 @@ bundle.
 
 `npm run test:e2e` (after `npm run build`) starts a clean local Worker (`dev:e2e`, port 8787) and
 drives the whole flow in Chromium: the TV at `/tv/` creates an aquarium, a phone joins with the code,
-sends a photographed drawing, sees it confirmed on the TV and lists it, then the TV ends the
-aquarium; axe checks the phone screens. CI runs `validate`, checks that the icons are reproducible
-and runs the end-to-end tests on every push to `main` and on pull requests.
+sends a photographed drawing, sees it confirmed on the TV and lists it, opens the printable
+templates and sends a photographed template (corners and kind found automatically), then the TV
+ends the aquarium; axe checks the phone screens. CI runs `validate`, checks that the icons and the
+templates are reproducible and runs the end-to-end tests on every push to `main` and on pull
+requests.
 
 ## Cloudflare resources (one-time, manual)
 

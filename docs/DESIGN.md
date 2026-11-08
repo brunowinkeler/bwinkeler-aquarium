@@ -2,7 +2,7 @@
 
 Living design document for Aquarium (`service_id: aquarium`), a product of the `bwinkeler.com` platform. It follows the platform contract `BW-PLATFORM-ARCH-001` v1.3 (`bwinkeler-infra/ARCHITECTURE.md`); where the two conflict, the platform contract and its precedence rules prevail, and every deviation is listed in [5. Platform conformance](#5-platform-conformance). Platform facts were verified against official documentation and source code between 2026-11-03 and 2026-11-07.
 
-**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet; ArUco templates pending) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA (Phase 5, without the printable templates); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a procedural backdrop.
+**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a procedural backdrop.
 **Last updated:** 2026-11-08.
 
 | Field             | Value                                                        |
@@ -146,11 +146,11 @@ Each fact below was checked against the cited source and drives a design decisio
 
 ### 4.3 Libraries and assets
 
-| Fact                                                                                                                                                                          | Design impact                                                                | Source                          |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------- |
-| Kenney **Fish Pack**: 120 files, CC0 license                                                                                                                                  | Backdrop and demo art without licensing concerns                             | [Kenney Fish Pack][kenney-fish] |
-| **js-aruco2**: pure JavaScript ArUco port; `ARUCO` and `ARUCO_MIP_36h12` (250 codes) dictionaries built in; detects markers on `ImageData` or raw RGBA; generates marker SVGs | Template detection and generation; confirm its license file before adding it | [js-aruco2][js-aruco2]          |
-| **PixiJS v8** defaults to WebGL 2 and treats WebGL 1 as a legacy fallback                                                                                                     | Rejected for Chromium 53 in favor of a small custom renderer                 | [PixiJS][pixijs]                |
+| Fact                                                                                                                                                                                                                                                                                                                                           | Design impact                                                                                                                                             | Source                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| Kenney **Fish Pack**: 120 files, CC0 license                                                                                                                                                                                                                                                                                                   | Backdrop and demo art without licensing concerns                                                                                                          | [Kenney Fish Pack][kenney-fish] |
+| **js-aruco2** 2.0.0: pure JavaScript ArUco port; `ARUCO` and `ARUCO_MIP_36h12` (250 codes) dictionaries built in; detects markers on `ImageData` or raw RGBA. MIT, but its license file also carries ArUco (BSD), OpenCV (BSD) and AForge.NET (LGPL-3.0) notices, and its script-style CommonJS (`this.AR = AR`) does not bundle with Rolldown | Used only in tests, as the reference for the marker codes and as an independent reader of the printed markers; the extractor ships its own small detector | [js-aruco2][js-aruco2]          |
+| **PixiJS v8** defaults to WebGL 2 and treats WebGL 1 as a legacy fallback                                                                                                                                                                                                                                                                      | Rejected for Chromium 53 in favor of a small custom renderer                                                                                              | [PixiJS][pixijs]                |
 
 ### 4.4 To verify on the real TV (Phase 0)
 
@@ -452,20 +452,29 @@ $$F = \frac{C - (1-\alpha)\,W}{\alpha}$$
 
 ```text
 ┌──────────────────────────────────────────────────────┐
-│ ▣ 0                                             1 ▣  │
-│   ┌──────────────────────────────────────────────┐   │
-│   │                                              │   │
-│   │                  Draw here                   │   │
-│   │                                              │   │
-│   └──────────────────────────────────────────────┘   │
-│ ▣ 3          Template: FISH                     2 ▣  │
+│ ▣ 0   Aquarium                                  1 ▣  │
+│ ┌──────────────────────────────────────────────────┐ │
+│ │                                                  │ │
+│ │                    Draw here                     │ │
+│ │                                                  │ │
+│ └──────────────────────────────────────────────────┘ │
+│ ▣ 3   Template: fish                            2 ▣  │
 └──────────────────────────────────────────────────────┘
 ```
 
-- A4 landscape; one `ARUCO_MIP_36h12` marker per corner.
-- Each corner has its own ID, so the photo's orientation is known; 3 of the 4 markers are enough (the fourth corner is inferred).
-- The crop is inset inside the frame so the frame line never reaches the mask.
-- Templates (SVG and A4 PDF) are generated at build time with js-aruco2 and offered on the "Printable templates" screen.
+- A4 landscape; one 28 mm `ARUCO_MIP_36h12` marker per corner, 10 mm from the edges; the frame
+  spans the width between the marker rows (277 × 126 mm).
+- Each corner has its own ID, so the photo's orientation is known; 3 of the 4 markers are enough.
+  The extractor finds dark square blobs (local threshold), reads their 6×6 bits in the four
+  rotations (at most 3 wrong bits), fits a least-squares homography from template millimetres to
+  the photo through every marker corner and rejects it when a corner is off by more than 12% of a
+  marker side.
+- The crop stays 2 mm inside the frame line (plus the usual inset), so the line never reaches the
+  mask; the corner step is skipped and the kind preselected.
+- `scripts/generate-templates.mjs` (`npm run templates`) writes an SVG preview and an A4 PDF per
+  kind and language (pt-BR, en) into `frontend/public/templates/` from the layout in
+  `extractor/src/template.ts`; CI checks that they are reproducible. The "Printable templates"
+  screen (`/templates`, no session needed) offers them.
 - Marker ID sets encode the creature kind:
 
 | Marker IDs | Kind                            |
@@ -940,7 +949,7 @@ After step 5; parallel; step 10 also depends on spike 1.
     - Fixed time step, adaptive quality, preview mode.
 11. `extractor`:
     - Image operations: color conversion, blur, dilate/erode, flood fill, connected components, homography, bilinear warp, Otsu.
-    - `detectPaperQuad` for free sheets and `detectTemplateMarkers` (js-aruco2) for templates.
+    - `detectPaperQuad` for free sheets and `detectTemplate` (own marker reader, see 9.4) for templates.
     - `extractCreature(params)`, running in a Web Worker, with golden tests on the fixtures.
 
 ### Phase 3 — Worker
