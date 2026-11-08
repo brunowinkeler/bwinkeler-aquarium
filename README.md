@@ -16,7 +16,7 @@ the creature to the TV, where it swims in an animated aquarium.
 | `frontend`: phone PWA (join, photo, preview)  | Implemented, served by the Worker            |
 | `backend`: Worker, Durable Objects, R2        | Deployed by hand to `aquarium.bwinkeler.com` |
 | `spikes/tv-spike`: webOS 4 feasibility app    | Ready to run on the TV                       |
-| `tv`: TV app                                  | Planned                                      |
+| `tv`: TV app, browser build at `/tv/`         | Implemented; webOS package after the spike   |
 
 ## Repository layout
 
@@ -25,6 +25,7 @@ shared/           Protocol types, TV-safe guards, Zod schemas (shared/schemas), 
 engine/           Creature motion and rendering shared by the phone preview and the TV
 extractor/        Paper detection, rectification and drawing segmentation (no AI)
 frontend/         Phone PWA (React): join, photo, corners, animated preview, send
+tv/               TV app (Chromium 53 bundle): create, join code and QR, live aquarium
 backend/          Cloudflare Worker, AquariumDO, JoinCodeDO, RegistryDO, tests
 spikes/tv-spike/  Throwaway ES5 webOS app for the Phase 0 measurements
 scripts/          Repository tooling

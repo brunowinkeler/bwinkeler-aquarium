@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    // Bundled for Chromium 53 (webOS 4): ES2015 library APIs only.
+    "lib": ["ES2015", "ES2016.Array.Include", "DOM"],
+    "types": [],
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src"]
+}

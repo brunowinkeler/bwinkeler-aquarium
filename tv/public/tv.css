@@ -1,0 +1,199 @@
+/* Chromium 53: flexbox and custom properties only (no grid, no inset, no gap on flex). */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #0a3552;
+  color: #fff;
+  font-family: 'LG Smart UI', 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 2.2vh;
+}
+
+.scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  max-width: 60vw;
+  padding: 4vh 5vw;
+  border-radius: 3vh;
+  background: rgba(7, 34, 54, 0.82);
+  text-align: center;
+}
+
+.card h1 {
+  margin: 0 0 2vh;
+  font-size: 3em;
+}
+
+.card p {
+  margin: 0 0 3vh;
+  font-size: 1.3em;
+}
+
+.tv-button {
+  display: block;
+  min-width: 30vw;
+  margin: 1.5vh auto 0;
+  padding: 1.6vh 3vw;
+  border: 0.5vh solid transparent;
+  border-radius: 2vh;
+  background: #ff8a3d;
+  color: #1a0d05;
+  font: inherit;
+  font-size: 1.4em;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tv-button:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 0.6vh #ffd23f;
+}
+
+.tv-button:disabled {
+  opacity: 0.6;
+}
+
+.error {
+  min-height: 1.2em;
+  margin: 2vh 0 0 !important;
+  color: #ffb4a8;
+}
+
+.join {
+  position: fixed;
+  right: 4vw;
+  bottom: 9vh;
+  width: 38vw;
+  padding: 3vh 2.5vw;
+  border-radius: 3vh;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f2a3d;
+  box-shadow: 0 1vh 4vh rgba(0, 0, 0, 0.4);
+}
+
+.join h2 {
+  margin: 0 0 2vh;
+  font-size: 1.8em;
+}
+
+.join__body {
+  display: flex;
+  align-items: center;
+}
+
+.join__qr {
+  width: 24vh;
+  height: 24vh;
+  margin-right: 2vw;
+  image-rendering: pixelated;
+}
+
+.join__steps {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 1.25em;
+  line-height: 1.6;
+}
+
+.join__code {
+  margin: 2vh 0 0;
+  font-size: 4.2em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.join__hint {
+  margin: 1vh 0 0;
+  color: #4a6274;
+  text-align: center;
+}
+
+.chip {
+  position: fixed;
+  right: 3vw;
+  bottom: 3vh;
+  padding: 1.2vh 2vw;
+  border-radius: 99vh;
+  background: rgba(7, 34, 54, 0.75);
+  font-size: 1.1em;
+}
+
+.menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 40vw;
+  padding: 4vh 3vw;
+  border-radius: 3vh;
+  background: rgba(7, 34, 54, 0.95);
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.menu h2 {
+  margin: 0 0 2vh;
+  font-size: 2em;
+}
+
+.toasts {
+  position: fixed;
+  top: 4vh;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.toast {
+  margin-bottom: 1.5vh;
+  padding: 1.4vh 3vw;
+  border-radius: 99vh;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f2a3d;
+  font-size: 1.4em;
+  font-weight: 700;
+}
+
+.offline {
+  position: fixed;
+  left: 3vw;
+  bottom: 3vh;
+  padding: 1vh 1.5vw;
+  border-radius: 1vh;
+  background: rgba(179, 38, 30, 0.85);
+}
+
+.debug {
+  position: fixed;
+  top: 2vh;
+  left: 2vw;
+  margin: 0;
+  padding: 1vh 1vw;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 0.9em;
+}

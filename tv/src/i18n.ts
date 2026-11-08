@@ -1,0 +1,96 @@
+const PT = {
+  title: 'Aquário',
+  tagline: 'Desenhe uma criatura do mar, fotografe com o celular e veja-a nadar aqui.',
+  newAquarium: 'Novo aquário',
+  creating: 'Criando o aquário…',
+  joinTitle: 'Entre neste aquário!',
+  joinOpen: 'Abra {host} no celular',
+  joinStep2: 'Digite o código ou leia o QR code',
+  joinHint: 'Voltar: fechar',
+  chip: 'OK: mostrar código · {phones}',
+  phonesNone: 'nenhum celular',
+  phonesOne: '1 celular',
+  phonesMany: '{count} celulares',
+  menuTitle: 'Menu',
+  menuShowCode: 'Mostrar código',
+  menuDisconnect: 'Desconectar celulares',
+  menuEnd: 'Encerrar aquário',
+  menuClose: 'Voltar ao aquário',
+  ended: 'O aquário terminou.',
+  expired: 'O aquário expirou.',
+  replaced: 'Este aquário foi aberto em outra tela.',
+  offline: 'Sem conexão. Tentando de novo…',
+  toastCreature: 'Novo desenho de {name}!',
+  toastCreatureAnonymous: 'Novo desenho!',
+  toastPhone: 'Um celular entrou no aquário',
+  toastDisconnected: 'Celulares desconectados',
+  errorCreate: 'Não foi possível criar o aquário. Tente de novo.',
+  errorBusy: 'Muitos aquários abertos agora. Tente mais tarde.',
+  errorLimit: 'Limite de novos aquários atingido. Tente mais tarde.',
+};
+
+export type TextKey = keyof typeof PT;
+
+const EN: Record<TextKey, string> = {
+  title: 'Aquarium',
+  tagline: 'Draw a sea creature, photograph it with your phone, and watch it swim here.',
+  newAquarium: 'New aquarium',
+  creating: 'Creating the aquarium…',
+  joinTitle: 'Join this aquarium!',
+  joinOpen: 'Open {host} on your phone',
+  joinStep2: 'Type the code or scan the QR code',
+  joinHint: 'Back: close',
+  chip: 'OK: show code · {phones}',
+  phonesNone: 'no phones',
+  phonesOne: '1 phone',
+  phonesMany: '{count} phones',
+  menuTitle: 'Menu',
+  menuShowCode: 'Show code',
+  menuDisconnect: 'Disconnect phones',
+  menuEnd: 'End aquarium',
+  menuClose: 'Back to the aquarium',
+  ended: 'The aquarium has ended.',
+  expired: 'The aquarium has expired.',
+  replaced: 'This aquarium was opened on another screen.',
+  offline: 'No connection. Retrying…',
+  toastCreature: 'New drawing from {name}!',
+  toastCreatureAnonymous: 'New drawing!',
+  toastPhone: 'A phone joined the aquarium',
+  toastDisconnected: 'Phones disconnected',
+  errorCreate: 'The aquarium could not be created. Try again.',
+  errorBusy: 'Too many aquariums are open right now. Try again later.',
+  errorLimit: 'The limit of new aquariums was reached. Try again later.',
+};
+
+function pickLanguage(): 'pt' | 'en' {
+  const forced = /[?&]lang=(pt|en)/.exec(window.location.search);
+  if (forced && forced[1] === 'en') return 'en';
+  if (forced) return 'pt';
+  return (navigator.language || '').toLowerCase().indexOf('en') === 0 ? 'en' : 'pt';
+}
+
+export const language = pickLanguage();
+const catalogue: Record<TextKey, string> = language === 'en' ? EN : PT;
+
+export function text(key: TextKey, params?: { [name: string]: string | number }): string {
+  const template = catalogue[key];
+  if (!params) return template;
+  return template.replace(/\{([a-z]+)\}/g, (match, name: string) =>
+    params[name] === undefined ? match : String(params[name]),
+  );
+}
+
+export function phonesText(count: number): string {
+  if (count === 0) return text('phonesNone');
+  return count === 1 ? text('phonesOne') : text('phonesMany', { count });
+}
+
+/** Fills every element that has a `data-text` key. */
+export function applyTexts(root: ParentNode): void {
+  const nodes = root.querySelectorAll('[data-text]');
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i] as HTMLElement;
+    node.textContent = text(node.getAttribute('data-text') as TextKey);
+  }
+  document.documentElement.lang = language === 'en' ? 'en' : 'pt-BR';
+}

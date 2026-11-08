@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Aquário</title>
+    <link rel="stylesheet" href="tv.css" />
+  </head>
+  <body>
+    <canvas id="scene" class="scene" aria-hidden="true"></canvas>
+
+    <section id="home" class="screen" aria-labelledby="home-title">
+      <div class="card">
+        <h1 id="home-title" data-text="title"></h1>
+        <p data-text="tagline"></p>
+        <button id="create" type="button" class="tv-button" data-text="newAquarium"></button>
+        <p id="home-error" class="error" role="alert"></p>
+      </div>
+    </section>
+
+    <section id="join" class="join" aria-labelledby="join-title" hidden>
+      <h2 id="join-title" data-text="joinTitle"></h2>
+      <div class="join__body">
+        <canvas id="qr" class="join__qr" width="240" height="240" aria-hidden="true"></canvas>
+        <ol class="join__steps">
+          <li id="join-open"></li>
+          <li data-text="joinStep2"></li>
+        </ol>
+      </div>
+      <p id="join-code" class="join__code" data-testid="join-code"></p>
+      <p class="join__hint" data-text="joinHint"></p>
+    </section>
+
+    <div id="chip" class="chip" hidden></div>
+
+    <section id="menu" class="menu" aria-labelledby="menu-title" hidden>
+      <h2 id="menu-title" data-text="menuTitle"></h2>
+      <button type="button" class="tv-button" data-action="code" data-text="menuShowCode"></button>
+      <button
+        type="button"
+        class="tv-button"
+        data-action="disconnect"
+        data-text="menuDisconnect"
+      ></button>
+      <button type="button" class="tv-button" data-action="end" data-text="menuEnd"></button>
+      <button type="button" class="tv-button" data-action="close" data-text="menuClose"></button>
+    </section>
+
+    <section id="ended" class="screen" aria-labelledby="ended-text" hidden>
+      <div class="card">
+        <h1 id="ended-text"></h1>
+        <button id="ended-new" type="button" class="tv-button" data-text="newAquarium"></button>
+      </div>
+    </section>
+
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <div id="offline" class="offline" role="status" data-text="offline" hidden></div>
+    <pre id="debug" class="debug" hidden></pre>
+
+    <script src="tv.js"></script>
+  </body>
+</html>
