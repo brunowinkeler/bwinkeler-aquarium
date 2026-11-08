@@ -11,10 +11,11 @@
   "workspaces": [
     "shared",
     "engine",
+    "extractor",
     "backend"
   ],
   "scripts": {
-    "build:libs": "npm run build -w @bwinkeler-aquarium/shared && npm run build -w @bwinkeler-aquarium/engine",
+    "build:libs": "npm run build -w @bwinkeler-aquarium/shared && npm run build -w @bwinkeler-aquarium/engine && npm run build -w @bwinkeler-aquarium/extractor",
     "build": "npm run build:libs && npm run build -w @bwinkeler-aquarium/backend",
     "typecheck": "npm run build:libs && npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
