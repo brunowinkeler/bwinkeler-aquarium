@@ -2,6 +2,7 @@ import {
   detectPaperQuad,
   detectTemplate,
   extractCreature,
+  extractPhoto,
   type RgbaImage,
 } from '@bwinkeler-aquarium/extractor';
 import type { WorkerReply, WorkerRequest } from './client';
@@ -36,7 +37,10 @@ scope.onmessage = (event) => {
       return;
     }
     if (!photo) throw new Error('No photo loaded');
-    const result = extractCreature(photo, request.quad, request.options);
+    const result =
+      request.mode === 'photo'
+        ? { image: extractPhoto(photo, request.quad), coverage: 1 }
+        : extractCreature(photo, request.quad, request.options);
     if (!result) {
       scope.postMessage({ type: 'empty', id: request.id });
       return;

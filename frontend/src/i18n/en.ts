@@ -60,6 +60,13 @@ export const en: Messages = {
   'corners.hint': 'Drag the dots to the corners of the paper.',
   'corners.reset': 'Detect again',
   'corners.continue': 'Continue',
+  'corners.mode': 'What did you photograph?',
+  'corners.modeDrawing': 'A drawing',
+  'corners.modePhoto': 'A photo (sent as it is)',
+  'corners.photoTitle': 'Crop the photo',
+  'corners.photoHint':
+    'Drag the dots to choose the part of the photo that goes to the aquarium. The photo is not processed.',
+  'corners.whole': 'Whole photo',
   'corners.handle': 'Corner {number}',
   'corners.photoLabel': 'Photo of the drawing',
 
@@ -78,6 +85,7 @@ export const en: Messages = {
   'preview.closeOutlines': 'Close outlines',
   'preview.looseParts': 'Include loose parts',
   'preview.corners': 'Adjust corners',
+  'preview.crop': 'Adjust the crop',
   'preview.name': 'Name (optional)',
   'preview.retake': 'Retake',
   'preview.send': 'Send to the TV',

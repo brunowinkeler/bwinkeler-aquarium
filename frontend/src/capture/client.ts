@@ -1,8 +1,11 @@
 import type { ExtractOptions, Quad, TemplateKind } from '@bwinkeler-aquarium/extractor';
 
+/** `photo` keeps the cropped picture as it is instead of separating a drawing from paper. */
+export type ExtractMode = 'drawing' | 'photo';
+
 export type WorkerRequest =
   | { type: 'load'; id: number; width: number; height: number; buffer: ArrayBuffer }
-  | { type: 'extract'; id: number; quad: Quad; options: ExtractOptions };
+  | { type: 'extract'; id: number; quad: Quad; options: ExtractOptions; mode: ExtractMode };
 
 export type WorkerReply =
   | { type: 'detected'; id: number; quad: Quad; confident: boolean; template: TemplateKind | null }
@@ -74,8 +77,12 @@ export class ExtractorClient {
     return { quad: reply.quad, confident: reply.confident, template: reply.template };
   }
 
-  async extract(quad: Quad, options: ExtractOptions): Promise<Extracted | null> {
-    const reply = await this.call({ type: 'extract', id: this.next++, quad, options });
+  async extract(
+    quad: Quad,
+    options: ExtractOptions,
+    mode: ExtractMode = 'drawing',
+  ): Promise<Extracted | null> {
+    const reply = await this.call({ type: 'extract', id: this.next++, quad, options, mode });
     if (reply.type === 'empty') return null;
     if (reply.type !== 'extracted') throw new Error('Unexpected worker reply');
     return {

@@ -96,15 +96,35 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await expect(phone.getByText('Já está nadando na TV!')).toBeVisible({ timeout: 20_000 });
   await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(2);
 
+  // A photo is only cropped: no paper removal.
+  await phone.getByRole('link', { name: 'Enviar outro desenho' }).click();
+  await phone.getByTestId('gallery-input').setInputFiles({
+    name: 'photo.png',
+    mimeType: 'image/png',
+    buffer: drawingPhoto(),
+  });
+  await expect(phone.getByRole('heading', { name: 'Ajuste os cantos da folha' })).toBeVisible();
+  await phone.locator('label', { hasText: 'Uma foto' }).click();
+  await expect(phone.getByRole('heading', { name: 'Recorte a foto' })).toBeVisible();
+  await phone.getByRole('button', { name: 'Foto inteira' }).click();
+  await expectAccessible(phone);
+  await phone.getByRole('button', { name: 'Continuar' }).click();
+  await expect(phone.getByRole('img', { name: 'Prévia animada da criatura' })).toBeVisible();
+  await expect(phone.getByRole('button', { name: 'Ajustar recorte' })).toBeVisible();
+  await expect(phone.getByText('Ajustes', { exact: true })).toBeHidden();
+  await phone.getByRole('button', { name: 'Enviar para a TV' }).click();
+  await expect(phone.getByText('Já está nadando na TV!')).toBeVisible({ timeout: 20_000 });
+  await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(3);
+
   // Removal asks inside the page; window.confirm is suppressed by some browsers.
   await phone.getByRole('link', { name: 'Ver o aquário' }).click();
-  await expect(phone.getByRole('listitem')).toHaveCount(2);
+  await expect(phone.getByRole('listitem')).toHaveCount(3);
   await phone.getByRole('button', { name: 'Remover' }).first().click();
   await expect(phone.getByText('Remover esta criatura do aquário?')).toBeVisible();
   await expectAccessible(phone);
   await phone.getByRole('button', { name: 'Sim, remover' }).click();
-  await expect(phone.getByRole('listitem')).toHaveCount(1);
-  await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(1);
+  await expect(phone.getByRole('listitem')).toHaveCount(2);
+  await expect.poll(async () => (await tvStatus(tv)).creatures.length).toBe(2);
 
   await tv.keyboard.press('Escape');
   await tv.getByRole('button', { name: 'Encerrar aquário' }).click();

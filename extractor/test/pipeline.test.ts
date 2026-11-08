@@ -5,6 +5,7 @@ import {
   DEFAULT_EXTRACT_OPTIONS,
   detectPaperQuad,
   extractCreature,
+  extractPhoto,
   floodFromBorder,
   otsu,
   project,
@@ -160,5 +161,21 @@ describe('extractCreature', () => {
     const low = segment(rectified, { sensitivity: -0.8, closeOutlines: 0.001 });
     const high = segment(rectified, { sensitivity: 0.8 });
     expect(high!.coverage).toBeGreaterThanOrEqual(low?.coverage ?? 0);
+  });
+});
+
+describe('extractPhoto', () => {
+  it('keeps the straightened crop as it is: opaque, paper included, at most 512 px', () => {
+    const { width, height, data } = extractPhoto(photoWithBubble, SHEET);
+    expect(Math.max(width, height)).toBe(512);
+    expect(width / height).toBeCloseTo(950 / 685, 1);
+    let transparent = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] !== 255) transparent++;
+    expect(transparent).toBe(0);
+    const body = (Math.round(0.5 * height) * width + Math.round(0.45 * width)) * 4;
+    expect(data[body]!).toBeGreaterThan(180);
+    expect(data[body + 2]!).toBeLessThan(110);
+    const paper = (Math.round(0.85 * height) * width + Math.round(0.3 * width)) * 4;
+    expect(Math.min(data[paper]!, data[paper + 1]!, data[paper + 2]!)).toBeGreaterThan(150);
   });
 });

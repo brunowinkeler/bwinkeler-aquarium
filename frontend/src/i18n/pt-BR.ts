@@ -58,6 +58,13 @@ export const ptBR = {
   'corners.hint': 'Arraste os pontos até os cantos do papel.',
   'corners.reset': 'Detectar de novo',
   'corners.continue': 'Continuar',
+  'corners.mode': 'O que você fotografou?',
+  'corners.modeDrawing': 'Um desenho',
+  'corners.modePhoto': 'Uma foto (vai como está)',
+  'corners.photoTitle': 'Recorte a foto',
+  'corners.photoHint':
+    'Arraste os pontos para escolher a parte da foto que vai para o aquário. A foto não é tratada.',
+  'corners.whole': 'Foto inteira',
   'corners.handle': 'Canto {number}',
   'corners.photoLabel': 'Foto do desenho',
 
@@ -76,6 +83,7 @@ export const ptBR = {
   'preview.closeOutlines': 'Fechar contornos',
   'preview.looseParts': 'Incluir partes soltas',
   'preview.corners': 'Ajustar cantos',
+  'preview.crop': 'Ajustar recorte',
   'preview.name': 'Nome (opcional)',
   'preview.retake': 'Tirar outra',
   'preview.send': 'Enviar para a TV',

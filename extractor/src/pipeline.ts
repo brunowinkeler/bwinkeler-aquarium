@@ -10,6 +10,7 @@ import {
   labelComponents,
   otsu,
   shrinkChannels,
+  shrinkRgba,
   type Component,
   type Mask,
   type RgbaImage,
@@ -359,4 +360,16 @@ export function extractCreature(
   const segmentation = segment(rectify(image, quad, settings), settings);
   if (!segmentation) return null;
   return { image: compose(segmentation, settings.maxOutput), coverage: segmentation.coverage };
+}
+
+/** The straightened crop as it is, for sending a picture instead of a drawing. */
+export function extractPhoto(
+  image: RgbaImage,
+  quad: Quad,
+  maxOutput = DEFAULT_EXTRACT_OPTIONS.maxOutput,
+): RgbaImage {
+  // Warp at twice the output size, then area-average down: bilinear alone would alias.
+  const rectified = rectify(image, quad, { inset: 0, workSize: maxOutput * 2 });
+  const size = fitSize(rectified.width, rectified.height, maxOutput);
+  return shrinkRgba(rectified, size.width, size.height);
 }

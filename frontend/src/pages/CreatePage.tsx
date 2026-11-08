@@ -16,7 +16,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import { api, ApiError, errorMessageKey, isGone } from '../api';
-import { ExtractorClient, type Extracted } from '../capture/client';
+import { ExtractorClient, type Extracted, type ExtractMode } from '../capture/client';
 import { CornerEditor } from '../capture/CornerEditor';
 import { canvasToPng, decodePhoto, imageToCanvas, rotateCanvas } from '../capture/photo';
 import { PreviewStage } from '../capture/PreviewStage';
@@ -40,6 +40,16 @@ const INITIAL_ADJUSTMENTS: Adjustments = {
 
 const POLL_MS = 1500;
 const POLL_ATTEMPTS = 40;
+const MODES: readonly ExtractMode[] = ['drawing', 'photo'];
+
+function wholePhoto(photo: HTMLCanvasElement): Quad {
+  return [
+    { x: 0, y: 0 },
+    { x: photo.width, y: 0 },
+    { x: photo.width, y: photo.height },
+    { x: 0, y: photo.height },
+  ];
+}
 
 async function retrying<T>(action: () => Promise<T>): Promise<T> {
   for (let attempt = 1; ; attempt++) {
@@ -68,6 +78,7 @@ export function CreatePage() {
   const [detected, setDetected] = useState<Quad | null>(null);
   const [quad, setQuad] = useState<Quad | null>(null);
   const [template, setTemplate] = useState<TemplateKind | null>(null);
+  const [mode, setMode] = useState<ExtractMode>('drawing');
   const [adjustments, setAdjustments] = useState<Adjustments>(INITIAL_ADJUSTMENTS);
   const [extracted, setExtracted] = useState<Extracted | null>(null);
   const [refining, setRefining] = useState(false);
@@ -119,26 +130,29 @@ export function CreatePage() {
     };
   }, [file]);
 
-  const extract = useCallback(async (corners: Quad, options: Adjustments) => {
-    const extractor = client.current;
-    if (!extractor) return;
-    const request = ++extraction.current;
-    setRefining(true);
-    try {
-      const result = await extractor.extract(corners, options);
-      if (request === extraction.current) setExtracted(result);
-    } catch {
-      if (request === extraction.current) setError('error.generic');
-    } finally {
-      if (request === extraction.current) setRefining(false);
-    }
-  }, []);
+  const extract = useCallback(
+    async (corners: Quad, options: Adjustments, extractMode: ExtractMode) => {
+      const extractor = client.current;
+      if (!extractor) return;
+      const request = ++extraction.current;
+      setRefining(true);
+      try {
+        const result = await extractor.extract(corners, options, extractMode);
+        if (request === extraction.current) setExtracted(result);
+      } catch {
+        if (request === extraction.current) setError('error.generic');
+      } finally {
+        if (request === extraction.current) setRefining(false);
+      }
+    },
+    [],
+  );
 
   const adjust = (next: Adjustments) => {
     setAdjustments(next);
     window.clearTimeout(debounce.current);
     debounce.current = window.setTimeout(() => {
-      if (quad) void extract(quad, next);
+      if (quad) void extract(quad, next, 'drawing');
     }, 250);
   };
 
@@ -173,8 +187,14 @@ export function CreatePage() {
     if (!quad) return;
     setError(null);
     setStep('processing');
-    await extract(quad, adjustments);
+    await extract(quad, adjustments, mode);
     setStep('preview');
+  };
+
+  const chooseMode = (next: ExtractMode) => {
+    setMode(next);
+    if (next === 'photo' && photo) setQuad(wholePhoto(photo));
+    else if (detected) setQuad(detected);
   };
 
   const send = async () => {
@@ -273,15 +293,38 @@ export function CreatePage() {
   }
 
   if (step === 'corners') {
+    const photoMode = mode === 'photo';
     return (
       <section className="page" aria-labelledby="corners-title">
-        <h1 id="corners-title">{t('corners.title')}</h1>
-        <p className="hint">{t('corners.hint')}</p>
+        <h1 id="corners-title">{t(photoMode ? 'corners.photoTitle' : 'corners.title')}</h1>
+        <fieldset className="kinds">
+          <legend>{t('corners.mode')}</legend>
+          {MODES.map((value) => (
+            <label key={value} className={value === mode ? 'chip chip--selected' : 'chip'}>
+              <input
+                type="radio"
+                name="mode"
+                value={value}
+                checked={value === mode}
+                onChange={() => chooseMode(value)}
+                className="visually-hidden"
+              />
+              {t(value === 'photo' ? 'corners.modePhoto' : 'corners.modeDrawing')}
+            </label>
+          ))}
+        </fieldset>
+        <p className="hint">{t(photoMode ? 'corners.photoHint' : 'corners.hint')}</p>
         <CornerEditor photo={photo} quad={quad} onChange={setQuad} />
         <div className="actions">
-          <button type="button" className="button" onClick={() => detected && setQuad(detected)}>
-            {t('corners.reset')}
-          </button>
+          {photoMode ? (
+            <button type="button" className="button" onClick={() => setQuad(wholePhoto(photo))}>
+              {t('corners.whole')}
+            </button>
+          ) : (
+            <button type="button" className="button" onClick={() => detected && setQuad(detected)}>
+              {t('corners.reset')}
+            </button>
+          )}
           <button
             type="button"
             className="button button--primary"
@@ -367,7 +410,7 @@ export function CreatePage() {
           ⟳ {t('preview.rotate')}
         </button>
       </div>
-      <details className="adjustments" open={!image}>
+      <details className="adjustments" open={!image} hidden={mode === 'photo'}>
         <summary>{t('preview.adjustments')}</summary>
         <label className="field">
           <span>{t('preview.sensitivity')}</span>
@@ -409,6 +452,11 @@ export function CreatePage() {
           {t('preview.corners')}
         </button>
       </details>
+      {mode === 'photo' && (
+        <button type="button" className="button" onClick={() => setStep('corners')}>
+          {t('preview.crop')}
+        </button>
+      )}
       <label className="field">
         <span>{t('preview.name')}</span>
         <input
