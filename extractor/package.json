@@ -18,5 +18,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run"
+  },
+  "devDependencies": {
+    "js-aruco2": "2.0.0"
   }
 }

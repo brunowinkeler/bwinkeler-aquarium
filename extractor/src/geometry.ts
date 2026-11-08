@@ -58,6 +58,64 @@ export function project(h: Homography, x: number, y: number): Point {
   };
 }
 
+function multiply(a: ArrayLike<number>, b: ArrayLike<number>): number[] {
+  const out: number[] = [];
+  for (let row = 0; row < 3; row++) {
+    for (let column = 0; column < 3; column++) {
+      let sum = 0;
+      for (let k = 0; k < 3; k++) sum += a[row * 3 + k]! * b[k * 3 + column]!;
+      out.push(sum);
+    }
+  }
+  return out;
+}
+
+/** Centroid and the scale that brings the mean distance from it to √2. */
+function normalization(points: readonly Point[]): { cx: number; cy: number; scale: number } {
+  let cx = 0;
+  let cy = 0;
+  for (const point of points) {
+    cx += point.x / points.length;
+    cy += point.y / points.length;
+  }
+  let spread = 0;
+  for (const point of points) spread += Math.hypot(point.x - cx, point.y - cy) / points.length;
+  return { cx, cy, scale: spread > 0 ? Math.SQRT2 / spread : 1 };
+}
+
+/** Least-squares homography mapping each `from` point onto the `to` point with the same index. */
+export function fitHomography(from: readonly Point[], to: readonly Point[]): Homography | null {
+  const count = Math.min(from.length, to.length);
+  if (count < 4) return null;
+  const a = normalization(from.slice(0, count));
+  const b = normalization(to.slice(0, count));
+  const normal = Array.from({ length: 8 }, () => new Array<number>(8).fill(0));
+  const rhs = new Array<number>(8).fill(0);
+  const accumulate = (row: readonly number[], value: number): void => {
+    for (let i = 0; i < 8; i++) {
+      rhs[i]! += row[i]! * value;
+      for (let j = 0; j < 8; j++) normal[i]![j]! += row[i]! * row[j]!;
+    }
+  };
+  for (let k = 0; k < count; k++) {
+    const x = (from[k]!.x - a.cx) * a.scale;
+    const y = (from[k]!.y - a.cy) * a.scale;
+    const u = (to[k]!.x - b.cx) * b.scale;
+    const v = (to[k]!.y - b.cy) * b.scale;
+    accumulate([x, y, 1, 0, 0, 0, -x * u, -y * u], u);
+    accumulate([0, 0, 0, x, y, 1, -x * v, -y * v], v);
+  }
+  const h = solve(normal, rhs);
+  if (!h) return null;
+  // Undo the normalization: H = B⁻¹ · Hn · A.
+  const normalizeFrom = [a.scale, 0, -a.scale * a.cx, 0, a.scale, -a.scale * a.cy, 0, 0, 1];
+  const denormalizeTo = [1 / b.scale, 0, b.cx, 0, 1 / b.scale, b.cy, 0, 0, 1];
+  const m = multiply(denormalizeTo, multiply([...h, 1], normalizeFrom));
+  const last = m[8]!;
+  if (Math.abs(last) < 1e-12) return null;
+  return Float64Array.from(m, (value) => value / last);
+}
+
 function distance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }

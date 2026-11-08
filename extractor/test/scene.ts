@@ -2,6 +2,9 @@ import { createRgba, solveHomography, type Quad, type RgbaImage } from '../src/i
 
 type Rgb = readonly [number, number, number];
 
+/** Printed content of the sheet (a template), drawn under the shapes; null = paper. */
+export type Print = (u: number, v: number) => Rgb | null;
+
 function noise(seed: number): () => number {
   let state = seed;
   return () => {
@@ -130,6 +133,7 @@ export function photograph(
   quad: Quad = SHEET,
   width = 1280,
   height = 960,
+  print?: Print,
 ): RgbaImage {
   const unit: Quad = [
     { x: 0, y: 0 },
@@ -148,7 +152,7 @@ export function photograph(
       const v = (toPaper[3]! * (x + 0.5) + toPaper[4]! * (y + 0.5) + toPaper[5]!) / w;
       let rgb: Rgb;
       if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
-        rgb = paperColor(shapes, u, v) ?? [246, 244, 238];
+        rgb = paperColor(shapes, u, v) ?? print?.(u, v) ?? [246, 244, 238];
       } else {
         rgb = [118, 96, 78];
       }
