@@ -112,3 +112,32 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await phone.goto('/');
   await expect(phone.getByText('Este aquário terminou. Crie um novo na TV.')).toBeVisible();
 });
+
+test('the /pc/ page is driven with clicks', async ({ browser }) => {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    locale: 'pt-BR',
+  });
+  const pc = await context.newPage();
+  await pc.goto('/pc/');
+  await pc.getByRole('button', { name: 'Novo aquário' }).click();
+  const code = pc.getByTestId('join-code');
+  await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/);
+  expect((await tvStatus(pc)).pointer).toBe(true);
+
+  await pc.getByRole('button', { name: 'Fechar' }).click();
+  await expect(code).toBeHidden();
+  await pc.getByRole('button', { name: 'Mostrar código' }).click();
+  await expect(code).toBeVisible();
+  await pc.getByRole('button', { name: 'Esconder código' }).click();
+  await expect(code).toBeHidden();
+
+  const sound = pc.getByRole('button', { name: 'Som: ligado' });
+  await sound.click();
+  await expect(pc.getByRole('button', { name: 'Som: desligado' })).toBeVisible();
+  expect((await tvStatus(pc)).sound).toBe('off');
+
+  await pc.getByRole('button', { name: 'Menu' }).click();
+  await pc.getByRole('button', { name: 'Encerrar aquário' }).click();
+  await expect(pc.getByText('O aquário terminou.')).toBeVisible();
+});

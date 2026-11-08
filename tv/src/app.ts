@@ -1,4 +1,5 @@
 import { formatJoinCode, type EndReason, type ServerMessage } from '@bwinkeler-aquarium/shared';
+import { SeaAmbience } from './ambience';
 import {
   apiHost,
   createAquarium,
@@ -16,8 +17,10 @@ import { RelayClient, type Connection } from './relay';
 import { AquariumScene } from './scene';
 
 const STORAGE_KEY = 'aquarium.tv';
+const SOUND_KEY = 'aquarium.sound';
 const CODE_REFRESH_MARGIN_MS = 60 * 1000;
 const TOAST_MS = 4000;
+const IDLE_MS = 4000;
 
 interface Credentials {
   aquariumId: string;
@@ -25,12 +28,39 @@ interface Credentials {
 }
 
 type Screen = 'home' | 'live' | 'ended';
-type MenuAction = 'code' | 'disconnect' | 'end' | 'close';
+type MenuAction = 'code' | 'sound' | 'disconnect' | 'end' | 'close';
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const node = document.getElementById(id);
   if (!node) throw new Error('Missing #' + id);
   return node as T;
+}
+
+type PrefixedDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => void;
+};
+
+function fullscreenElement(): Element | null {
+  return (
+    document.fullscreenElement || (document as PrefixedDocument).webkitFullscreenElement || null
+  );
+}
+
+/** Chromium 53 only has the prefixed API, and some versions return no promise. */
+function toggleFullscreen(): void {
+  const page = document as PrefixedDocument;
+  const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void };
+  let pending: Promise<void> | undefined;
+  if (fullscreenElement()) {
+    if (document.exitFullscreen) pending = document.exitFullscreen() as Promise<void> | undefined;
+    else if (page.webkitExitFullscreen) page.webkitExitFullscreen();
+  } else if (root.requestFullscreen) {
+    pending = root.requestFullscreen() as Promise<void> | undefined;
+  } else if (root.webkitRequestFullscreen) {
+    root.webkitRequestFullscreen();
+  }
+  if (pending) pending.catch(() => undefined);
 }
 
 /** Screens, keys and the aquarium session of the TV client. */
@@ -48,15 +78,25 @@ export class TvApp {
   private menuOpen = false;
   private debugOpen = false;
   private creating = false;
+  private soundOn: boolean;
+  private idleTimer = 0;
+  private readonly ambience = new SeaAmbience();
   private readonly scene: AquariumScene;
   private readonly home = byId('home');
   private readonly createButton = byId<HTMLButtonElement>('create');
   private readonly homeError = byId('home-error');
   private readonly join = byId('join');
+  private readonly joinClose = byId<HTMLButtonElement>('join-close');
   private readonly joinCodeText = byId('join-code');
   private readonly qr = byId<HTMLCanvasElement>('qr');
   private readonly chip = byId('chip');
+  private readonly toolbar = byId('toolbar');
+  private readonly toolCode = byId<HTMLButtonElement>('tool-code');
+  private readonly toolSound = byId<HTMLButtonElement>('tool-sound');
+  private readonly toolFullscreen = byId<HTMLButtonElement>('tool-fullscreen');
+  private readonly toolMenu = byId<HTMLButtonElement>('tool-menu');
   private readonly menu = byId('menu');
+  private readonly menuSound = byId<HTMLButtonElement>('menu-sound');
   private readonly ended = byId('ended');
   private readonly endedText = byId('ended-text');
   private readonly endedButton = byId<HTMLButtonElement>('ended-new');
@@ -67,6 +107,7 @@ export class TvApp {
   constructor(private readonly platform: TvPlatform) {
     applyTexts(document);
     byId('join-open').textContent = text('joinOpen', { host: apiHost() });
+    this.soundOn = platform.load(SOUND_KEY) !== 'off';
     this.scene = new AquariumScene(
       byId<HTMLCanvasElement>('scene'),
       () => (this.credentials ? this.credentials.token : null),
@@ -90,6 +131,8 @@ export class TvApp {
       );
     }
     window.setInterval(() => this.renderDebug(), 1000);
+    if (this.platform.pointer) this.setUpPointer();
+    this.renderSound();
     const saved = this.loadCredentials();
     if (saved) this.goLive(saved, false);
     else this.showHome();
@@ -106,7 +149,61 @@ export class TvApp {
       joinCode: this.joinCode ? this.joinCode.code : null,
       creatures: this.scene.creatures(),
       fps: this.scene.fps,
+      pointer: this.platform.pointer,
+      sound: this.soundOn ? this.ambience.state : 'off',
     };
+  }
+
+  /** /pc/: clickable controls that fade out while the mouse rests. */
+  private setUpPointer(): void {
+    const hint = this.join.querySelector('.join__hint');
+    if (hint instanceof HTMLElement) hint.hidden = true;
+    this.joinClose.hidden = false;
+    this.joinClose.addEventListener('click', () => this.closePanel());
+    this.toolCode.addEventListener('click', () =>
+      this.panelOpen ? this.closePanel() : this.openPanel(false),
+    );
+    this.toolSound.addEventListener('click', () => this.toggleSound());
+    this.toolFullscreen.addEventListener('click', () => toggleFullscreen());
+    this.toolMenu.addEventListener('click', () =>
+      this.menuOpen ? this.closeMenu() : this.openMenu(),
+    );
+    for (const type of ['mousemove', 'mousedown', 'touchstart', 'keydown']) {
+      document.addEventListener(type, () => this.wake(), true);
+    }
+    for (const type of ['fullscreenchange', 'webkitfullscreenchange']) {
+      document.addEventListener(type, () => this.renderTools());
+    }
+  }
+
+  private wake(): void {
+    document.body.classList.remove('idle');
+    window.clearTimeout(this.idleTimer);
+    this.idleTimer = window.setTimeout(() => {
+      if (this.screen === 'live' && !this.menuOpen) document.body.classList.add('idle');
+    }, IDLE_MS);
+  }
+
+  private renderTools(): void {
+    this.toolbar.hidden = !this.platform.pointer || this.screen !== 'live';
+    this.toolCode.textContent = text(this.panelOpen ? 'toolHideCode' : 'toolCode');
+    this.toolFullscreen.textContent = text(
+      fullscreenElement() ? 'toolExitFullscreen' : 'toolFullscreen',
+    );
+  }
+
+  private renderSound(): void {
+    const label = text(this.soundOn ? 'soundOn' : 'soundOff');
+    this.toolSound.textContent = label;
+    this.menuSound.textContent = label;
+  }
+
+  private toggleSound(): void {
+    this.soundOn = !this.soundOn;
+    this.platform.save(SOUND_KEY, this.soundOn ? null : 'off');
+    this.renderSound();
+    if (this.soundOn && this.screen === 'live') this.ambience.start();
+    else this.ambience.stop();
   }
 
   private loadCredentials(): Credentials | null {
@@ -132,6 +229,8 @@ export class TvApp {
     this.ended.hidden = true;
     this.chip.hidden = true;
     this.homeError.textContent = error ? text(error) : '';
+    this.ambience.stop();
+    this.renderTools();
     this.createButton.focus();
   }
 
@@ -169,6 +268,9 @@ export class TvApp {
     this.home.hidden = true;
     this.ended.hidden = true;
     this.updateChip();
+    this.renderTools();
+    if (this.platform.pointer) this.wake();
+    if (this.soundOn) this.ambience.start();
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (this.relay) this.relay.stop();
     this.relay = new RelayClient(socketUrl(credentials.aquariumId), credentials.token, {
@@ -224,11 +326,14 @@ export class TvApp {
     this.chip.hidden = true;
     this.offline.hidden = true;
     this.scene.clear();
+    this.ambience.stop();
     if (reason === 'unauthorized') {
       this.showHome();
       return;
     }
     this.screen = 'ended';
+    this.renderTools();
+    document.body.classList.remove('idle');
     this.endedText.textContent = text(
       reason === 'expired' ? 'expired' : reason === 'replaced' ? 'replaced' : 'ended',
     );
@@ -244,7 +349,8 @@ export class TvApp {
   }
 
   private updateChip(): void {
-    this.chip.textContent = text('chip', { phones: phonesText(this.phoneCount) });
+    const phones = phonesText(this.phoneCount);
+    this.chip.textContent = this.platform.pointer ? phones : text('chip', { phones });
     this.chip.hidden = this.screen !== 'live' || this.panelOpen;
   }
 
@@ -254,6 +360,7 @@ export class TvApp {
     this.panelAuto = auto;
     this.join.hidden = false;
     this.updateChip();
+    this.renderTools();
     this.refreshCode();
   }
 
@@ -262,6 +369,7 @@ export class TvApp {
     this.join.hidden = true;
     window.clearTimeout(this.codeTimer);
     this.updateChip();
+    this.renderTools();
   }
 
   /** Shows a valid code and asks for a new one shortly before it expires. */
@@ -310,6 +418,10 @@ export class TvApp {
   }
 
   private menuAction(action: MenuAction): void {
+    if (action === 'sound') {
+      this.toggleSound();
+      return;
+    }
     const credentials = this.credentials;
     this.closeMenu();
     if (!credentials) return;

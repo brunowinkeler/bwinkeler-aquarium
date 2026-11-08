@@ -3,6 +3,8 @@ export type TvKey = 'ok' | 'back' | 'up' | 'down' | 'left' | 'right' | 'red';
 /** Everything that differs between TV platforms (DESIGN §13.3). */
 export interface TvPlatform {
   readonly name: string;
+  /** Mouse or touch instead of a remote: clickable controls replace the OK and Back hints. */
+  readonly pointer: boolean;
   onKey(handler: (key: TvKey, event: KeyboardEvent) => void): void;
   keepAwake(): void;
   canExit: boolean;
@@ -43,10 +45,11 @@ interface WakeLockNavigator {
   wakeLock?: { request(type: 'screen'): Promise<unknown> };
 }
 
-/** The `/tv/` build in any browser: keyboard keys, Screen Wake Lock, localStorage. */
-export function browserPlatform(): TvPlatform {
+/** The `/tv/` and `/pc/` builds in any browser: keyboard keys, Screen Wake Lock, localStorage. */
+export function browserPlatform(pointer: boolean): TvPlatform {
   return {
     name: 'browser',
+    pointer,
     canExit: false,
     onKey(handler) {
       document.addEventListener('keydown', (event) => {

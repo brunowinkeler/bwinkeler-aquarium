@@ -1,10 +1,13 @@
 // Bundles the TV app into one IIFE for Chromium 53 and places it at /tv/ next to the PWA.
+// /pc/ serves the same bundle with clickable controls for a mouse or touch screen.
 import { build } from 'esbuild';
-import { cpSync, mkdirSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const out = fileURLToPath(new URL('../frontend/dist/tv/', import.meta.url));
+const pc = fileURLToPath(new URL('../frontend/dist/pc/', import.meta.url));
 mkdirSync(out, { recursive: true });
+mkdirSync(pc, { recursive: true });
 
 await build({
   entryPoints: [fileURLToPath(new URL('./src/main.ts', import.meta.url))],
@@ -19,3 +22,14 @@ await build({
 });
 
 cpSync(fileURLToPath(new URL('./public/', import.meta.url)), out, { recursive: true });
+
+let page = readFileSync(`${out}/index.html`, 'utf8');
+for (const [from, to] of [
+  ['<html lang="pt-BR">', '<html lang="pt-BR" data-input="pointer">'],
+  ['href="tv.css"', 'href="/tv/tv.css"'],
+  ['src="tv.js"', 'src="/tv/tv.js"'],
+]) {
+  if (!page.includes(from)) throw new Error(`tv/public/index.html no longer contains ${from}`);
+  page = page.replace(from, to);
+}
+writeFileSync(`${pc}/index.html`, page);

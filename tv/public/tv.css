@@ -142,6 +142,59 @@ body {
   font-size: 1.1em;
 }
 
+.join__close {
+  position: absolute;
+  top: 2vh;
+  right: 1.5vw;
+  padding: 0.8vh 1.2vw;
+  border: 0.3vh solid #1e7fae;
+  border-radius: 99vh;
+  background: #fff;
+  color: #0f2a3d;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toolbar {
+  position: fixed;
+  top: 2vh;
+  right: 2vw;
+  display: flex;
+  -webkit-transition: opacity 0.4s;
+  transition: opacity 0.4s;
+}
+
+.tool {
+  margin-left: 0.8vw;
+  padding: 1vh 1.4vw;
+  border: 0.3vh solid rgba(255, 255, 255, 0.5);
+  border-radius: 99vh;
+  background: rgba(7, 34, 54, 0.8);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tool:hover,
+.tool:focus {
+  outline: none;
+  border-color: #fff;
+  background: rgba(30, 127, 174, 0.95);
+}
+
+/* Pointer mode: controls and cursor fade out while the mouse rests. */
+.idle .toolbar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.idle,
+.idle .scene {
+  cursor: none;
+}
+
 .menu {
   position: fixed;
   top: 50%;

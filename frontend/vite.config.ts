@@ -54,13 +54,14 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,pdf}'],
-        globIgnores: ['tv/**'],
+        globIgnores: ['tv/**', 'pc/**'],
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [
           /^\/api\//,
           /^\/ws\//,
           /^\/health\//,
           /^\/tv(\/|$)/,
+          /^\/pc(\/|$)/,
           /^\/templates\//,
         ],
         cleanupOutdatedCaches: true,

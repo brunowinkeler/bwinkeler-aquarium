@@ -21,3 +21,6 @@
 
 /tv/*
   Cache-Control: no-cache
+
+/pc/*
+  Cache-Control: no-cache

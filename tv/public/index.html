@@ -20,6 +20,7 @@
     </section>
 
     <section id="join" class="join" aria-labelledby="join-title" hidden>
+      <button id="join-close" type="button" class="join__close" data-text="close" hidden></button>
       <h2 id="join-title" data-text="joinTitle"></h2>
       <div class="join__body">
         <canvas id="qr" class="join__qr" width="240" height="240" aria-hidden="true"></canvas>
@@ -34,9 +35,18 @@
 
     <div id="chip" class="chip" hidden></div>
 
+    <!-- Shown on /pc/, where a mouse or touch replaces the remote control. -->
+    <div id="toolbar" class="toolbar" hidden>
+      <button id="tool-code" type="button" class="tool"></button>
+      <button id="tool-sound" type="button" class="tool"></button>
+      <button id="tool-fullscreen" type="button" class="tool"></button>
+      <button id="tool-menu" type="button" class="tool" data-text="toolMenu"></button>
+    </div>
+
     <section id="menu" class="menu" aria-labelledby="menu-title" hidden>
       <h2 id="menu-title" data-text="menuTitle"></h2>
       <button type="button" class="tv-button" data-action="code" data-text="menuShowCode"></button>
+      <button id="menu-sound" type="button" class="tv-button" data-action="sound"></button>
       <button
         type="button"
         class="tv-button"

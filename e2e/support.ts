@@ -130,6 +130,8 @@ export interface TvStatus {
   panelOpen: boolean;
   joinCode: string | null;
   creatures: string[];
+  pointer: boolean;
+  sound: 'off' | 'waiting' | 'playing' | 'unavailable';
 }
 
 export function tvStatus(page: Page): Promise<TvStatus> {
