@@ -679,10 +679,17 @@ export class AquariumDO extends DurableObject<Env> {
     else await this.ctx.storage.setAlarm(next);
   }
 
-  /** Ending and expiry share one path; every step is safe to retry. */
+  /**
+   * Ending and expiry share one path. Storage goes first: the R2 and registry calls below let
+   * other requests in, and they must already find the aquarium gone. If the cleanup after it
+   * is interrupted, the registry's daily sweep finishes it.
+   */
   private async destroy(reason: EndReason): Promise<void> {
     const meta = this.meta();
     if (!meta) return;
+    await this.ctx.storage.deleteAlarm();
+    await this.ctx.storage.deleteAll();
+    this.ready = false;
     const ended = JSON.stringify({ type: 'aquarium_ended', reason } satisfies ServerMessage);
     for (const ws of this.openSockets()) {
       if (this.attachment(ws)?.deviceId) {
@@ -696,9 +703,6 @@ export class AquariumDO extends DurableObject<Env> {
     }
     await this.env.REGISTRY.getByName(REGISTRY_NAME).unregister(meta.aquarium_id);
     await deletePrefix(this.env.IMAGES, `aquariums/${meta.aquarium_id}/`);
-    await this.ctx.storage.deleteAlarm();
-    await this.ctx.storage.deleteAll();
-    this.ready = false;
     log('aquarium_ended', { aquariumId: meta.aquarium_id, reason });
   }
 }

@@ -90,23 +90,24 @@ describe('TV routes', () => {
     const registry = env.REGISTRY.getByName(REGISTRY_NAME);
     const liveBefore = await registry.liveCount();
 
-    const response = await call('/api/tv/aquarium', {
+    const ending = call('/api/tv/aquarium', {
       method: 'DELETE',
       headers: tvHeaders(tv.token),
     });
-    expect(response.status).toBe(204);
     expect(await socket.next('aquarium_ended')).toEqual({
       type: 'aquarium_ended',
       reason: 'ended',
     });
-    expect((await socket.closed()).code).toBe(4010);
-    expect(await storedKeys(tv.aquariumId)).toEqual([]);
-    expect(await registry.liveCount()).toBe(liveBefore - 1);
-
+    // Phones must see the end as soon as the TV does, even while R2 is still being cleaned.
     const session = await call('/api/session', { headers: phoneHeaders(cookie) });
     expect(session.status).toBe(410);
     expect(session.headers.get('Set-Cookie')).toContain('Max-Age=0');
     expect((await session.json<ErrorResponse>()).error).toBe('gone');
+
+    expect((await ending).status).toBe(204);
+    expect((await socket.closed()).code).toBe(4010);
+    expect(await storedKeys(tv.aquariumId)).toEqual([]);
+    expect(await registry.liveCount()).toBe(liveBefore - 1);
   });
 
   it('disconnects every phone', async () => {
