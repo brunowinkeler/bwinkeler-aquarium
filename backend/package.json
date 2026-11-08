@@ -1,0 +1,21 @@
+{
+  "name": "@bwinkeler-aquarium/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "typecheck": "tsc -p tsconfig.json && tsc -p test/tsconfig.json",
+    "types": "wrangler types",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bwinkeler-aquarium/shared": "*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.6.0",
+    "wrangler": "4.158.0"
+  }
+}
