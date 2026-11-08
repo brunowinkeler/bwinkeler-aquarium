@@ -4,10 +4,24 @@ import {
   startAnimation,
   World,
 } from '@bwinkeler-aquarium/engine';
-import type { Creature, CreatureKind, RemovalReason } from '@bwinkeler-aquarium/shared';
+import type {
+  Creature,
+  CreatureKind,
+  CreatureSize,
+  RemovalReason,
+} from '@bwinkeler-aquarium/shared';
 import { fetchImage } from './api';
 
-const DEMO: CreatureKind[] = ['swim', 'pulse', 'walk', 'glide', 'swim'];
+// Hand-drawn stand-ins: all of them in an empty aquarium, the first DEMO_KEPT always.
+const DEMO: readonly { kind: CreatureKind; size: CreatureSize }[] = [
+  { kind: 'swim', size: 'medium' },
+  { kind: 'pulse', size: 'small' },
+  { kind: 'walk', size: 'small' },
+  { kind: 'glide', size: 'medium' },
+  { kind: 'swim', size: 'small' },
+  { kind: 'swim', size: 'large' },
+];
+const DEMO_KEPT = 3;
 
 interface Loaded {
   source: CanvasImageSource;
@@ -38,7 +52,7 @@ function decode(blob: Blob): Promise<Loaded> {
   });
 }
 
-/** The animated aquarium: real creatures from the server, demo fish while it is empty. */
+/** The animated aquarium: real creatures from the server among a few demo ones. */
 export class AquariumScene {
   private readonly world = new World({ width: 1280, height: 720 });
   private readonly renderer: Canvas2DRenderer;
@@ -65,7 +79,7 @@ export class AquariumScene {
     };
     fit();
     window.addEventListener('resize', fit);
-    this.showDemo();
+    this.updateDemo();
     startAnimation((seconds) => {
       this.world.step(seconds);
       this.renderer.render(this.world);
@@ -111,7 +125,7 @@ export class AquariumScene {
           entry: dive ? 'dive' : 'none',
         });
         this.real[creature.id] = true;
-        this.hideDemo();
+        this.updateDemo();
         if (creature.displayedAt === null) this.onShown(creature.id);
       })
       .catch(() => {
@@ -122,27 +136,36 @@ export class AquariumScene {
   remove(id: string, reason: RemovalReason): void {
     delete this.real[id];
     this.world.remove(id, reason);
-    if (this.creatures().length === 0) this.showDemo();
+    this.updateDemo();
   }
 
   clear(): void {
     for (const id of this.creatures()) this.remove(id, 'deleted');
   }
 
-  private showDemo(): void {
-    if (this.demo.length > 0) return;
-    for (let i = 0; i < DEMO.length; i++) {
-      const kind = DEMO[i] as CreatureKind;
-      const id = 'demo-' + i + '-' + Date.now();
-      const sprite = createDemoSprite(kind, 'demo-' + i);
+  /** Fewer stand-ins as real creatures arrive, but never fewer than DEMO_KEPT. */
+  private updateDemo(): void {
+    const wanted = Math.max(DEMO_KEPT, DEMO.length - this.creatures().length);
+    while (this.demo.length > wanted) {
+      const id = this.demo.pop();
+      if (id) this.world.remove(id, 'deleted');
+    }
+    while (this.demo.length < wanted) {
+      const index = this.demo.length;
+      const demo = DEMO[index];
+      if (!demo) return;
+      const id = 'demo-' + index + '-' + Date.now();
+      const sprite = createDemoSprite(demo.kind, 'demo-' + index);
       this.renderer.setImage(id, sprite.canvas, sprite.width, sprite.height);
-      this.world.add({ id, kind, facing: 'right', width: sprite.width, height: sprite.height });
+      this.world.add({
+        id,
+        kind: demo.kind,
+        size: demo.size,
+        facing: 'right',
+        width: sprite.width,
+        height: sprite.height,
+      });
       this.demo.push(id);
     }
-  }
-
-  private hideDemo(): void {
-    for (const id of this.demo) this.world.remove(id, 'deleted');
-    this.demo = [];
   }
 }
