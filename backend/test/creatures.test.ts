@@ -43,6 +43,26 @@ describe('creatures', () => {
     expect(shown).toMatchObject({ id, status: 'active', mine: true });
   });
 
+  it('keeps the chosen size, and small for phones that send none', async () => {
+    const { tv, cookie } = await aquariumWithPhone();
+    const { socket } = await connectTv(tv);
+    const large = createUlid();
+    expect((await reserve(cookie, { id: large, size: 'large' })).status).toBe(201);
+    expect((await reserve(cookie, { id: large, size: 'medium' })).status).toBe(409);
+    expect((await upload(cookie, large, png(64, 48))).status).toBe(200);
+    expect((await socket.next('creature_added')).creature).toMatchObject({
+      id: large,
+      size: 'large',
+    });
+
+    const plain = await sendCreature(cookie);
+    expect((await socket.next('creature_added')).creature).toMatchObject({
+      id: plain,
+      size: 'small',
+    });
+    expect((await reserve(cookie, { size: 'huge' })).status).toBe(400);
+  });
+
   it('treats the phone ULID as an idempotency key', async () => {
     const { cookie } = await aquariumWithPhone();
     const id = createUlid();

@@ -10,6 +10,7 @@ import {
   type Creature,
   type CreatureKind,
   type CreatureListResponse,
+  type CreatureSize,
   type CreatureStatus,
   type EndReason,
   type Facing,
@@ -39,6 +40,7 @@ type CreatureRow = {
   id: string;
   kind: string;
   facing: string;
+  size: string;
   author: string | null;
   width: number;
   height: number;
@@ -67,7 +69,7 @@ export interface ImageLocation {
 const HOUR_MS = 60 * 60 * 1000;
 const WS_OPEN = 1;
 const CREATURE_COLUMNS =
-  'id, kind, facing, author, width, height, status, object_key, created_by, created_at, displayed_at';
+  'id, kind, facing, size, author, width, height, status, object_key, created_by, created_at, displayed_at';
 
 const MIGRATIONS = [
   `CREATE TABLE meta (
@@ -99,6 +101,7 @@ const MIGRATIONS = [
   );
   CREATE INDEX creatures_by_activation ON creatures (status, activated_at);
   CREATE TABLE upload_log (at INTEGER NOT NULL);`,
+  `ALTER TABLE creatures ADD COLUMN size TEXT NOT NULL DEFAULT 'small';`,
 ];
 
 const GONE = fail(410, 'gone', 'This aquarium has ended');
@@ -108,6 +111,7 @@ function toCreature(row: CreatureRow): Creature {
     id: row.id,
     kind: row.kind as CreatureKind,
     facing: row.facing as Facing,
+    size: row.size as CreatureSize,
     author: row.author,
     width: row.width,
     height: row.height,
@@ -278,6 +282,7 @@ export class AquariumDO extends DurableObject<Env> {
         existing.created_by === deviceId &&
         existing.kind === input.kind &&
         existing.facing === input.facing &&
+        existing.size === input.size &&
         existing.author === input.author &&
         existing.width === input.width &&
         existing.height === input.height;
@@ -298,11 +303,12 @@ export class AquariumDO extends DurableObject<Env> {
     }
     this.sql.exec('INSERT INTO upload_log (at) VALUES (?)', now);
     this.sql.exec(
-      `INSERT INTO creatures (id, kind, facing, author, width, height, status, created_by, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+      `INSERT INTO creatures (id, kind, facing, size, author, width, height, status, created_by, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
       input.id,
       input.kind,
       input.facing,
+      input.size,
       input.author,
       input.width,
       input.height,

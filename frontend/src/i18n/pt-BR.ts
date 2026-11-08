@@ -85,6 +85,11 @@ export const ptBR = {
   'kind.walk': 'Caranguejo',
   'kind.glide': 'Tartaruga',
 
+  'preview.size': 'Tamanho',
+  'size.small': 'Pequeno',
+  'size.medium': 'Médio',
+  'size.large': 'Grande',
+
   'templates.link': 'Modelos para imprimir',
   'templates.title': 'Modelos para imprimir',
   'templates.intro':

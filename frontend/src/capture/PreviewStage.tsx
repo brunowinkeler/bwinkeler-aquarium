@@ -1,17 +1,18 @@
 import { Canvas2DRenderer, startAnimation, World } from '@bwinkeler-aquarium/engine';
-import type { CreatureKind, Facing } from '@bwinkeler-aquarium/shared';
+import type { CreatureKind, CreatureSize, Facing } from '@bwinkeler-aquarium/shared';
 import { useEffect, useRef } from 'react';
 
 interface PreviewStageProps {
   id: string;
   image: HTMLCanvasElement;
   kind: CreatureKind;
+  size: CreatureSize;
   facing: Facing;
   label: string;
 }
 
 /** The creature swimming in a small aquarium, driven by the same engine as the TV. */
-export function PreviewStage({ id, image, kind, facing, label }: PreviewStageProps) {
+export function PreviewStage({ id, image, kind, size, facing, label }: PreviewStageProps) {
   const holder = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
 
@@ -29,7 +30,7 @@ export function PreviewStage({ id, image, kind, facing, label }: PreviewStagePro
     };
     fit();
     renderer.setImage(id, image, image.width, image.height);
-    world.add({ id, kind, facing, width: image.width, height: image.height });
+    world.add({ id, kind, facing, size, width: image.width, height: image.height });
     const observer = new ResizeObserver(fit);
     observer.observe(box);
     const stop = startAnimation((seconds) => {
@@ -40,7 +41,7 @@ export function PreviewStage({ id, image, kind, facing, label }: PreviewStagePro
       stop();
       observer.disconnect();
     };
-  }, [id, image, kind, facing]);
+  }, [id, image, kind, size, facing]);
 
   return (
     <div ref={holder} className="stage">

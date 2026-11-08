@@ -426,6 +426,8 @@ h1 {
 }
 
 .chip {
+  /* Keeps the visually hidden radio inside the chip, so focusing it scrolls to the chip. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;

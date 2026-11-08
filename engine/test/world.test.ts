@@ -47,6 +47,24 @@ describe('World', () => {
     expect(preview.personality.size).toBeGreaterThan(tv.personality.size);
   });
 
+  it('scales a creature by its size, small being the default', () => {
+    const id = '01JD7Q7Y8X3K2M4N5P6R7S8T9X';
+    const world = new World({ width: WIDTH, height: HEIGHT });
+    const length = (size?: CreatureSpec['size']) => {
+      const creature = new World({ width: WIDTH, height: HEIGHT }).add(spec(id, { size }));
+      return spriteSize(world, creature).width;
+    };
+    expect(length()).toBeCloseTo(length('small'), 9);
+    expect(length('medium') / length('small')).toBeCloseTo(1.35, 9);
+    expect(length('large') / length('small')).toBeCloseTo(1.75, 9);
+
+    const preview = (size: CreatureSpec['size']) =>
+      new World({ width: 400, height: 300, preview: true }).add(spec(id, { size })).personality
+        .size;
+    expect(preview('small')).toBeLessThan(preview('medium'));
+    expect(preview('medium')).toBeLessThan(preview('large'));
+  });
+
   it('is deterministic for a seed regardless of the frame rate', () => {
     const coarse = new World({ width: WIDTH, height: HEIGHT });
     const fine = new World({ width: WIDTH, height: HEIGHT });

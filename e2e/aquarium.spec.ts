@@ -60,6 +60,9 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await phone.getByRole('button', { name: 'Continuar' }).click();
   await expect(phone.getByRole('img', { name: 'Prévia animada da criatura' })).toBeVisible();
   await phone.getByRole('radio', { name: 'Peixe' }).check();
+  // The radios are visually hidden: click their chip, as a person would.
+  await phone.locator('label', { hasText: 'Grande' }).click();
+  await expect(phone.getByRole('radio', { name: 'Grande' })).toBeChecked();
   await phone.getByLabel('Nome (opcional)').fill('Olivia');
   await expectAccessible(phone);
   await phone.getByRole('button', { name: 'Enviar para a TV' }).click();
@@ -69,6 +72,7 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await phone.getByRole('link', { name: 'Ver o aquário' }).click();
   await expect(phone.getByRole('listitem')).toHaveCount(1);
   await expect(phone.getByText('por Olivia')).toBeVisible();
+  await expect(phone.getByText('Peixe · Grande')).toBeVisible();
   await expectAccessible(phone);
 
   // A photographed printed template skips the corners and picks the kind.

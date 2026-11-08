@@ -1,4 +1,4 @@
-import type { CreatureKind, Facing, RemovalReason } from '@bwinkeler-aquarium/shared';
+import type { CreatureKind, CreatureSize, Facing, RemovalReason } from '@bwinkeler-aquarium/shared';
 import { PROFILES } from './profiles.js';
 import { between, createRandom, hashSeed, type Random } from './random.js';
 
@@ -11,6 +11,8 @@ export interface CreatureSpec {
   /** Image size in pixels; only the aspect ratio matters. */
   width: number;
   height: number;
+  /** Defaults to `small`, the size every creature had before sizes existed. */
+  size?: CreatureSize;
   /** `dive` drops the creature in from above with bubbles. */
   entry?: 'dive' | 'none';
 }
@@ -77,6 +79,18 @@ export const TURN_SECONDS = 0.6;
 const MAX_BUBBLES = 90;
 const TAU = Math.PI * 2;
 
+export const SIZE_SCALE: Readonly<Record<CreatureSize, number>> = {
+  small: 1,
+  medium: 1.35,
+  large: 1.75,
+};
+// The preview shows one creature, so its sizes are compressed to stay readable.
+const PREVIEW_SCALE: Readonly<Record<CreatureSize, number>> = {
+  small: 0.62,
+  medium: 0.8,
+  large: 1,
+};
+
 function setState(creature: SimCreature, state: CreatureState, timer = 0): void {
   creature.state = state;
   creature.stateTime = 0;
@@ -87,7 +101,12 @@ function clamp(value: number, min: number, max: number): number {
   return value < min ? min : value > max ? max : value;
 }
 
-function createPersonality(kind: CreatureKind, random: Random, preview: boolean): Personality {
+function createPersonality(
+  kind: CreatureKind,
+  size: CreatureSize,
+  random: Random,
+  preview: boolean,
+): Personality {
   const profile = PROFILES[kind];
   const span = profile.band[1] - profile.band[0];
   const preferred = span * 0.6;
@@ -98,12 +117,12 @@ function createPersonality(kind: CreatureKind, random: Random, preview: boolean)
     bandTop: top,
     bandBottom: top + preferred,
     depth: random(),
-    size: between(random, 0.15, 0.21),
+    size: between(random, 0.15, 0.21) * SIZE_SCALE[size],
     phase: random() * TAU,
   };
   if (preview) {
     personality.depth = 1;
-    personality.size = kind === 'walk' ? 0.3 : 0.38;
+    personality.size = (kind === 'walk' ? 0.3 : 0.38) * PREVIEW_SCALE[size];
     personality.bandTop = profile.band[0];
     personality.bandBottom = profile.band[1];
   }
@@ -182,7 +201,7 @@ export class World {
     const existing = this.get(spec.id);
     if (existing) return existing;
     const random = createRandom(hashSeed(spec.id));
-    const personality = createPersonality(spec.kind, random, this.preview);
+    const personality = createPersonality(spec.kind, spec.size ?? 'small', random, this.preview);
     const heading: 1 | -1 = random() < 0.5 ? -1 : 1;
     const creature: SimCreature = {
       id: spec.id,

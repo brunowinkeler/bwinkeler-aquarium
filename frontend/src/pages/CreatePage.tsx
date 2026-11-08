@@ -5,10 +5,12 @@ import {
 } from '@bwinkeler-aquarium/extractor';
 import {
   CREATURE_KINDS,
+  CREATURE_SIZES,
   createUlid,
   MAX_AUTHOR_LENGTH,
   MAX_IMAGE_BYTES,
   type CreatureKind,
+  type CreatureSize,
   type Facing,
 } from '@bwinkeler-aquarium/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -71,6 +73,7 @@ export function CreatePage() {
   const [refining, setRefining] = useState(false);
   const [id, setId] = useState(() => createUlid());
   const [kind, setKind] = useState<CreatureKind>('swim');
+  const [size, setSize] = useState<CreatureSize>('medium');
   const [facing, setFacing] = useState<Facing>('right');
   const [turns, setTurns] = useState(0);
   const [author, setAuthor] = useState('');
@@ -185,6 +188,7 @@ export function CreatePage() {
       const metadata = {
         kind,
         facing,
+        size,
         author: name ? name : null,
         width: image.width,
         height: image.height,
@@ -299,6 +303,7 @@ export function CreatePage() {
           id={id}
           image={image}
           kind={kind}
+          size={size}
           facing={facing}
           label={t('preview.canvasLabel')}
         />
@@ -325,6 +330,22 @@ export function CreatePage() {
               className="visually-hidden"
             />
             {t(`kind.${value}`)}
+          </label>
+        ))}
+      </fieldset>
+      <fieldset className="kinds">
+        <legend>{t('preview.size')}</legend>
+        {CREATURE_SIZES.map((value) => (
+          <label key={value} className={value === size ? 'chip chip--selected' : 'chip'}>
+            <input
+              type="radio"
+              name="size"
+              value={value}
+              checked={value === size}
+              onChange={() => setSize(value)}
+              className="visually-hidden"
+            />
+            {t(`size.${value}`)}
           </label>
         ))}
       </fieldset>

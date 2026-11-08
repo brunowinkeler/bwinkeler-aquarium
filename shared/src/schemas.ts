@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CREATURE_KINDS, FACINGS } from './enums.js';
+import { CREATURE_KINDS, CREATURE_SIZES, FACINGS } from './enums.js';
 import { MAX_AUTHOR_LENGTH, MAX_IMAGE_DIMENSION } from './limits.js';
 import type { CreateCreatureRequest, JoinRequest, TvMessage } from './protocol.js';
 import { isUlid } from './ulid.js';
@@ -20,6 +20,8 @@ export const createCreatureRequestSchema: z.ZodType<CreateCreatureRequest> = z.s
   id: ulidSchema,
   kind: z.enum(CREATURE_KINDS),
   facing: z.enum(FACINGS),
+  // Phones from before sizes existed send none; they showed today's small size.
+  size: z.enum(CREATURE_SIZES).default('small'),
   author: authorSchema.nullish().transform((value) => (value ? value : null)),
   width: z.int().min(1).max(MAX_IMAGE_DIMENSION),
   height: z.int().min(1).max(MAX_IMAGE_DIMENSION),

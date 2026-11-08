@@ -1,11 +1,13 @@
 import {
   CREATURE_KINDS,
+  CREATURE_SIZES,
   END_REASONS,
   ERROR_CODES,
   FACINGS,
   REMOVAL_REASONS,
   isOneOf,
   type CreatureKind,
+  type CreatureSize,
   type CreatureStatus,
   type EndReason,
   type ErrorCode,
@@ -23,6 +25,7 @@ export interface Creature {
   id: string;
   kind: CreatureKind;
   facing: Facing;
+  size: CreatureSize;
   author: string | null;
   width: number;
   height: number;
@@ -68,6 +71,7 @@ export interface CreateCreatureRequest {
   id: string;
   kind: CreatureKind;
   facing: Facing;
+  size: CreatureSize;
   author: string | null;
   width: number;
   height: number;
@@ -135,6 +139,7 @@ export function isCreature(value: unknown): value is Creature {
     isUlid(value.id) &&
     isOneOf(CREATURE_KINDS, value.kind) &&
     isOneOf(FACINGS, value.facing) &&
+    isOneOf(CREATURE_SIZES, value.size) &&
     (value.author === null || typeof value.author === 'string') &&
     isDimension(value.width) &&
     isDimension(value.height) &&

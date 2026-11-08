@@ -105,6 +105,7 @@ export class AquariumScene {
           id: creature.id,
           kind: creature.kind,
           facing: creature.facing,
+          size: creature.size,
           width: image.width,
           height: image.height,
           entry: dive ? 'dive' : 'none',

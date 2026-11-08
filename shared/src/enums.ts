@@ -1,6 +1,9 @@
 export const CREATURE_KINDS = ['swim', 'pulse', 'walk', 'glide'] as const;
 export type CreatureKind = (typeof CREATURE_KINDS)[number];
 
+export const CREATURE_SIZES = ['small', 'medium', 'large'] as const;
+export type CreatureSize = (typeof CREATURE_SIZES)[number];
+
 export const FACINGS = ['left', 'right'] as const;
 export type Facing = (typeof FACINGS)[number];
 

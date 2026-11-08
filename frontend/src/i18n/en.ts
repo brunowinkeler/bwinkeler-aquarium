@@ -87,6 +87,11 @@ export const en: Messages = {
   'kind.walk': 'Crab',
   'kind.glide': 'Turtle',
 
+  'preview.size': 'Size',
+  'size.small': 'Small',
+  'size.medium': 'Medium',
+  'size.large': 'Large',
+
   'templates.link': 'Printable templates',
   'templates.title': 'Printable templates',
   'templates.intro':

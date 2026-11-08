@@ -103,7 +103,13 @@ export function png(width: number, height: number, size = 64): Uint8Array {
 
 export function reserve(
   cookie: string,
-  overrides: Partial<{ id: string; width: number; height: number; author: string | null }> = {},
+  overrides: Partial<{
+    id: string;
+    width: number;
+    height: number;
+    author: string | null;
+    size: string;
+  }> = {},
 ) {
   return postJson(
     '/api/creatures',

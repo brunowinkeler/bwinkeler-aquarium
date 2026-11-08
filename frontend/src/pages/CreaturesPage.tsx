@@ -83,7 +83,9 @@ export function CreaturesPage() {
                   </span>
                 )}
                 <span className="creature__text">
-                  <strong>{t(`kind.${creature.kind}`)}</strong>
+                  <strong>
+                    {t(`kind.${creature.kind}`)} · {t(`size.${creature.size}`)}
+                  </strong>
                   {creature.author && <span>{t('list.by', { name: creature.author })}</span>}
                   {creature.mine && <span className="badge">{t('list.mine')}</span>}
                 </span>

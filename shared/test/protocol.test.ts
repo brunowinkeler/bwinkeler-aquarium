@@ -6,6 +6,7 @@ const creature: Creature = {
   id: '01ARZ3NDEKTSV4RRFFQ69G5FAV',
   kind: 'swim',
   facing: 'right',
+  size: 'medium',
   author: 'Olivia',
   width: 512,
   height: 384,
@@ -46,6 +47,15 @@ describe('parseServerMessage', () => {
       ),
     ).toBeNull();
     expect(
+      parseServerMessage(
+        JSON.stringify({
+          type: 'creature_added',
+          revision: 1,
+          creature: { ...creature, size: 'xl' },
+        }),
+      ),
+    ).toBeNull();
+    expect(
       parseServerMessage(JSON.stringify({ type: 'creature_removed', revision: 1, id: 'x' })),
     ).toBeNull();
   });
@@ -71,6 +81,9 @@ describe('schemas', () => {
     expect(parsed.author).toBe('Olivia W.');
 
     const base = { id: creature.id, kind: 'swim', facing: 'right', width: 10, height: 10 };
+    expect(createCreatureRequestSchema.parse(base).size).toBe('small');
+    expect(createCreatureRequestSchema.parse({ ...base, size: 'large' }).size).toBe('large');
+    expect(createCreatureRequestSchema.safeParse({ ...base, size: 'huge' }).success).toBe(false);
     expect(createCreatureRequestSchema.parse({ ...base, author: '   ' }).author).toBeNull();
     expect(createCreatureRequestSchema.parse(base).author).toBeNull();
     expect(createCreatureRequestSchema.safeParse({ ...base, author: 'x'.repeat(25) }).success).toBe(
