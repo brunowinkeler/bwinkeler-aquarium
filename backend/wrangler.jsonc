@@ -17,7 +17,7 @@
     ],
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AquariumDO", "JoinCodeDO", "RegistryDO"] }],
-  "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "bwinkeler-aquarium" }],
+  "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "bwinkeler-aquarium-files" }],
   "ratelimits": [
     { "name": "CREATE_LIMITER", "namespace_id": "4101", "simple": { "limit": 3, "period": 60 } },
     { "name": "JOIN_LIMITER", "namespace_id": "4102", "simple": { "limit": 10, "period": 60 } },

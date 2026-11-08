@@ -32,7 +32,7 @@ command on every push to `main` and on pull requests.
 
 These steps touch the shared Cloudflare account; run them only when the first deploy is approved.
 
-1. Create the private bucket: `npx wrangler r2 bucket create bwinkeler-aquarium`.
+1. Create the private bucket: `npx wrangler r2 bucket create bwinkeler-aquarium-files`.
 2. Set the IP hashing key from `backend/`: `npx wrangler secret put IP_HASH_KEY` with a random value
    such as the output of `openssl rand -base64 32`.
 3. Create an API token limited to the account and the `bwinkeler.com` zone (Workers scripts, Workers

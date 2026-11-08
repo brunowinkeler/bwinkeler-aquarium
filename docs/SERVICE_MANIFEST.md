@@ -43,7 +43,7 @@ None. The service runs on Cloudflare Workers (ADR 001).
 ## Object storage
 
 - Required: yes
-- Bucket: private R2 bucket `bwinkeler-aquarium`, binding `IMAGES` (no credentials in code)
+- Bucket: private R2 bucket `bwinkeler-aquarium-files`, binding `IMAGES` (no credentials in code)
 - Keys: `aquariums/{aquariumId}/creatures/{creatureId}.png`
 - Data classification: private; served only through the authorized proxy routes
 - Lifecycle: deleted when a creature is removed or evicted and when its aquarium ends or expires;

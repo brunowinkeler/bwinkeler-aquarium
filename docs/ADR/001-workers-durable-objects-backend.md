@@ -19,8 +19,8 @@ object storage. The owner already runs Pages projects on the same Cloudflare acc
    `aquarium.bwinkeler.com`.
 2. Keep each aquarium in its own SQLite-backed Durable Object (`AquariumDO`), with join codes in
    `JoinCodeDO` and global counters in a single `RegistryDO`.
-3. Store images in the private R2 bucket `bwinkeler-aquarium` through a binding, never in Durable
-   Object storage, as platform §16 requires for files.
+3. Store images in the private R2 bucket `bwinkeler-aquarium-files` through a binding, never in
+   Durable Object storage, as platform §16 requires for files.
 4. Use the WebSocket Hibernation API so idle TV connections cost nothing.
 5. Embed forward-only SQL migrations in the code instead of a migration tool and a migrator role.
 6. Deploy with `wrangler deploy` and roll back with `wrangler rollback` instead of versioned images.

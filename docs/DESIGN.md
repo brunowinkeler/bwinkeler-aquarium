@@ -92,7 +92,7 @@ Other TV brands are in scope only if they require no extra development or resear
 | Aquarium lifecycle    | Short-lived session owned by the single TV that created it; deleted after **4 hours** without that TV connected (configurable); no maximum lifetime while the TV stays connected; "End aquarium" on the TV deletes it immediately |
 | Joining               | 6-character code and QR shown on the TV, typed or scanned on the phone; a code is valid for 10 minutes and can be used by several phones; the TV can show a code again at any time                                                |
 | Accounts              | None. The TV holds a bearer token and each phone a session cookie; both end with the aquarium (ADR 003)                                                                                                                           |
-| Image storage         | Private R2 bucket `bwinkeler-aquarium`; the Durable Object keeps metadata only (platform §16)                                                                                                                                     |
+| Image storage         | Private R2 bucket `bwinkeler-aquarium-files`; the Durable Object keeps metadata only (platform §16)                                                                                                                               |
 | Mobile platform       | PWA: no app store, no Mac, instant updates                                                                                                                                                                                        |
 | Mobile UI stack       | React 19 + Vite 8 + react-router 7 + `vite-plugin-pwa` with prompted updates, as in Practice Companion                                                                                                                            |
 | Paper input           | Free white sheet (automatic paper detection + manual corner adjustment) **and** a printed template with ArUco markers (automatic rotation; the creature kind is encoded in the marker IDs)                                        |
@@ -171,7 +171,7 @@ Each row maps a rule of the platform contract to this product. Deviations are de
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | §3.1 One subdomain per application       | `aquarium.bwinkeler.com`, a Worker Custom Domain                                                                                                                     | Conforms                                                                      |
 | §4.3 Repository and documentation layout | `docs/` with `PLATFORM_ARCHITECTURE.md` (copy), `REQUIREMENTS.md`, `SERVICE_MANIFEST.md`, `OPERATIONS.md`, `DESIGN.md` and ADRs; `AGENTS.md`                         | Conforms                                                                      |
-| §5 Naming                                | `service_id` `aquarium`; Worker and R2 bucket `bwinkeler-aquarium`                                                                                                   | Conforms                                                                      |
+| §5 Naming                                | `service_id` `aquarium`; Worker `bwinkeler-aquarium`, R2 bucket `bwinkeler-aquarium-files`                                                                           | Conforms                                                                      |
 | §6.1 Self-contained local development    | `wrangler dev` runs the Worker, Durable Objects and R2 locally; no Compose file                                                                                      | Conforms (different tooling)                                                  |
 | §9.4 Same origin per application         | PWA, `/api` and `/ws` share one host                                                                                                                                 | Conforms; the TV runs on `file://`, so only `/api/tv/*` allows CORS (ADR 002) |
 | §11 PostgreSQL and migrations            | SQLite inside each aquarium's Durable Object; forward-only migrations embedded in the code                                                                           | **Exception** (ADR 001)                                                       |
@@ -887,7 +887,7 @@ In `bwinkeler-infra`, as a separate commit (platform §1.2):
 
 In the Cloudflare account, by hand:
 
-6. Create the private R2 bucket `bwinkeler-aquarium`.
+6. Create the private R2 bucket `bwinkeler-aquarium-files`.
 7. Create a deploy API token limited to the account and the `bwinkeler.com` zone (Worker scripts and Custom Domains), and store `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in the repository's `production` environment.
 
 Nothing changes on the VPS, in Caddy, in PostgreSQL or in GHCR.
