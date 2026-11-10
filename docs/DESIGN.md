@@ -2,7 +2,7 @@
 
 Living design document for Aquarium (`service_id: aquarium`), a product of the `bwinkeler.com` platform. It follows the platform contract `BW-PLATFORM-ARCH-001` v1.3 (`bwinkeler-infra/ARCHITECTURE.md`); where the two conflict, the platform contract and its precedence rules prevail, and every deviation is listed in [5. Platform conformance](#5-platform-conformance). Platform facts were verified against official documentation and source code between 2026-11-03 and 2026-11-07.
 
-**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build, plus `/pc/` with clickable controls (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a layered procedural seabed.
+**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build, plus the site root with clickable controls (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the phone PWA under `/join/` with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a layered procedural seabed.
 **Last updated:** 2026-11-08.
 
 | Field             | Value                                                        |
@@ -208,7 +208,7 @@ flowchart LR
     APP["appTV (packaged IPK on file://)<br/>background video + WebGL canvas"]
   end
   subgraph CF["Cloudflare · zone bwinkeler.com"]
-    W["Worker bwinkeler-aquarium<br/>aquarium.bwinkeler.com<br/>static PWA + /api + /ws"]
+    W["Worker bwinkeler-aquarium<br/>aquarium.bwinkeler.com<br/>screen at / and /tv/, phone PWA at /join/, /api, /ws"]
     ADO[("AquariumDO · one per aquarium<br/>SQLite: devices, creatures, revision<br/>hibernating WebSockets · expiry alarm")]
     JDO[("JoinCodeDO · one per code<br/>code → aquarium, TTL")]
     RDO[("RegistryDO · single instance<br/>live aquariums, creation quotas, sweep")]
@@ -304,7 +304,7 @@ sequenceDiagram
 - Join code: 6 characters from Crockford Base32 (input also accepts `O` for `0` and `I` or `L` for `1`), valid for 10 minutes and usable by several phones. While the join panel is visible, the TV asks for a fresh code before the current one expires.
 - Guessing is limited per IP; with about a billion possible codes and at most 50 live aquariums, a random hit is negligible, and the TV always shows how many phones joined.
 - `JoinCodeDO` is addressed per code with `getByName(code)`, so there is no global bottleneck; an alarm deletes it after expiry.
-- The QR code opens `https://aquarium.bwinkeler.com/join?code=…`, which pre-fills the code.
+- The QR code opens `https://aquarium.bwinkeler.com/join/?code=…`, which pre-fills the code; the TV also tells phones to open `aquarium.bwinkeler.com/join`.
 - On iOS, a PWA installed on the home screen keeps its own storage, separate from Safari, so joining is also available inside the installed app (type the code or scan the QR).
 - The TV shows a toast when a phone joins and keeps the phone count in the corner chip.
 - A phone stays in the aquarium until it leaves, the TV disconnects all phones, or the aquarium ends.
@@ -492,10 +492,11 @@ $$F = \frac{C - (1-\alpha)\,W}{\alpha}$$
 - Decode and downscale on the main thread, then transfer the RGBA buffer to the Web Worker, which avoids depending on `OffscreenCanvas` support in workers.
 - Output PNG through `canvas.toBlob('image/png')`; WebP encoding is not available in every mobile browser.
 - The preview plays the same background video as the TV (720p copy) and uses the same engine, seeded with the creature ID.
-- A service worker caches the app shell, the background video and the templates, and never handles `/api/*`, `/ws/*`, `/tv/*` or `/pc/*`; capture and preview work offline, sending needs the network.
+- A service worker scoped to `/join/` caches the app shell, the background video and the templates; capture and preview work offline, sending needs the network.
 - Photo as it is: at the corner step the phone can pick "a photo" instead of "a drawing". The corners then frame the whole photo, and `extractPhoto` only straightens and crops it (warp at twice the output size, then area-average down to at most 512 px), so the opaque picture swims like a drawing.
 - Session: joining sets the `aquarium_sid` cookie (`Secure`, `HttpOnly`, `SameSite=Lax`). State-changing requests also send a custom header, and the Worker checks that `Origin` is `https://aquarium.bwinkeler.com`; together they block cross-site requests.
-- `public/_headers`, adapted from Practice Companion: `camera=(self)` in `Permissions-Policy` (QR scanning), `media-src 'self'` for the background video, `img-src 'self' data: blob:` for previews, `connect-src 'self'`, and `no-cache` for `sw.js` and the manifest.
+- `site/_headers`, adapted from Practice Companion: `camera=(self)` in `Permissions-Policy` (QR scanning), `media-src 'self'` for the background video, `img-src 'self' data: blob:` for previews, `connect-src 'self'`, and `no-cache` for the service workers and the manifest.
+- Addresses: the aquarium screen is the site root (clickable controls) and `/tv/` (remote control); the phone app lives under `/join/`, and `site/_redirects` serves its single page for `/join/new`, `/join/creatures` and `/join/templates`. `/pc/` and the old phone paths (`/new`, `/creatures`, `/templates`) redirect to their new places. Phones and installed copies that still open the root are sent to `/join/`, and `/sw.js` replaces the old root service worker with one that unregisters itself; the manifest keeps the `id` `/`, so installed copies stay the same app.
 - Install: on iOS, Share → Add to Home Screen; on Android, the install prompt.
 
 ## 10. appTV (webOS 4.x)
@@ -574,9 +575,9 @@ Right after creation, with the join panel open. Once the first phone joins, the 
 - **Empty aquarium:** six hand-drawn demo creatures swim until drawings arrive, and the first three always stay, so a single drawing still looks like the sea; the join panel stays open until the first phone joins.
 - **Seabed:** three layers painted once per size at the canvas pixel ratio. The backdrop holds the water, two hazy reef silhouettes, far kelp and corals, and sand with dunes, ripples and pebbles under a vignette; the decor layer holds the corals, rocks, shells and starfish with soft shadows; the foreground (a dark kelp, a rock and a red coral at the edges) is drawn over the creatures. Kelp, sea grass and sea lettuce are painted once into sprites and sway in 8 to 20 horizontal slices, each shifted more toward the tip, behind and in front of the corals. Sizes follow the height of a 16:9 frame, so the 4:3 phone preview is not crowded.
 - **Quality and FPS:** "Quality: light (720p)" in the menu draws the scene at most 720 lines high (the renderer's pixel ratio becomes 720 / height) and lets the browser stretch the canvas; "FPS counter" shows the frame rate and the canvas size in a corner. Both choices are remembered.
-- **Idle:** after 4 seconds without input the phone count fades out, together with the `/pc/` toolbar and cursor; any key, mouse move or touch, or a phone joining or leaving, brings them back.
-- **Sound:** a generated ambience (Web Audio: slow pad chords, sparse bells, filtered-noise waves and bubbles, a feedback delay instead of reverb) plays while the aquarium is live; nothing is recorded, so nothing needs a license. Browsers keep it suspended until the first click or key press. "Sound" in the menu, and in the `/pc/` toolbar, turns it off and is remembered.
-- **Browser build:** the same bundle at `/tv/` runs in other TVs' browsers, on a PC over HDMI, or on a Raspberry Pi in kiosk mode. `/pc/` serves it with `data-input="pointer"`: buttons at the top right (show code, sound, full screen, menu) replace the OK and Back hints, and the join panel gets a close button.
+- **Idle:** after 4 seconds without input the phone count fades out, together with the toolbar and cursor of the site root; any key, mouse move or touch, or a phone joining or leaving, brings them back.
+- **Sound:** a generated ambience (Web Audio: slow pad chords, sparse bells, filtered-noise waves and bubbles, a feedback delay instead of reverb) plays while the aquarium is live; nothing is recorded, so nothing needs a license. Browsers keep it suspended until the first click or key press. "Sound" in the menu, and in the toolbar of the site root, turns it off and is remembered.
+- **Browser build:** the same bundle at `/tv/` runs in other TVs' browsers, on a PC over HDMI, or on a Raspberry Pi in kiosk mode. The site root serves it with `data-input="pointer"`: buttons at the top right (show code, sound, full screen, menu) replace the OK and Back hints, and the join panel gets a close button.
 
 ### 10.5 Background video asset
 
@@ -868,7 +869,7 @@ bwinkeler-aquarium/
 ├── engine/                      world, behaviors, WebGL/Canvas renderers (Chromium 53 safe)
 ├── extractor/                   image ops, detectors, pipeline, fixtures
 ├── backend/                     Worker, AquariumDO, JoinCodeDO, RegistryDO, wrangler.jsonc, tests
-├── frontend/                    React PWA, public/_headers, public/templates/
+├── frontend/                    React PWA (built into dist/join/), site/ (_headers, _redirects), public/templates/
 ├── tv/                          webOS app: appinfo.json, assets/, src/platform/, ares scripts
 ├── spikes/tv-spike/             Phase 0 webOS app (ES5, no build step)
 ├── scripts/                     generate-spike-icons.mjs, check-artifacts.mjs, generate-templates.mjs
@@ -886,7 +887,7 @@ flowchart LR
 ```
 
 - **Release:** the same flow as Listly: `npm version` in a `chore(release)` commit and a `vX.Y.Z` tag; `deploy.yaml` runs `wrangler deploy` in the `production` environment with `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. Roll back with `wrangler rollback` to the previous version.
-- **Cloudflare:** one deploy publishes the Worker, the three Durable Object classes, the static assets (PWA at `/`, TV browser build at `/tv/`) and the Custom Domain.
+- **Cloudflare:** one deploy publishes the Worker, the three Durable Object classes, the static assets (aquarium screen at `/` and `/tv/`, phone PWA at `/join/`) and the Custom Domain.
 - **TV:** `tv:package` (`ares-package`), `tv:install` (`ares-install`), `tv:launch` and `tv:inspect` (remote DevTools); CI attaches the IPK to each release.
 - **Developer Mode renewal:** a scheduled workflow calls the renewal endpoint with the session token stored as a repository secret.
 - **Line endings:** `.gitattributes` with `* text=auto eol=lf`; shell scripts and workflows break with CRLF.
@@ -987,8 +988,8 @@ After spikes 1–2, steps 9–10 and 12–16.
 
 After steps 9–17; parallel with Phase 4.
 
-26. App shell: React 19, react-router 7, `vite-plugin-pwa` with prompted updates, `pt-BR` and `en` catalogues, `public/_headers`.
-27. Join by code or QR scan (`getUserMedia` + jsQR); `/join?code=` deep link; leave; "aquarium ended" handling on `410`.
+26. App shell: React 19, react-router 7, `vite-plugin-pwa` with prompted updates, `pt-BR` and `en` catalogues, `site/_headers`.
+27. Join by code or QR scan (`getUserMedia` + jsQR); `/join/?code=` link; leave; "aquarium ended" handling on `410`.
 28. Capture from camera or gallery; downscale to at most 2048 px.
 29. Corner adjustment with four draggable handles and a magnifier; skipped when markers are found.
 30. Preview with the engine in preview mode over the same background video, with all controls.

@@ -74,12 +74,12 @@ AI segmentation, TV brands other than LG webOS (unless they need no extra work),
 
 ### 3.2 Joining
 
-| ID         | Requirement                                                                                                                               | Verification |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-JOIN-01 | A phone shall join by typing the code (case, spaces and hyphens ignored; `O`, `I`, `L` read as `0`, `1`, `1`) or by scanning the QR code. | T, D         |
-| FR-JOIN-02 | An aquarium shall accept at most 10 phones (configurable).                                                                                | T            |
-| FR-JOIN-03 | A phone that joins the same aquarium again shall keep its session; joining another aquarium shall leave the first.                        | T            |
-| FR-JOIN-04 | A phone shall be able to leave the aquarium.                                                                                              | T            |
+| ID         | Requirement                                                                                                                                          | Verification |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| FR-JOIN-01 | A phone shall join at `/join` by typing the code (case, spaces and hyphens ignored; `O`, `I`, `L` read as `0`, `1`, `1`) or by scanning the QR code. | T, D         |
+| FR-JOIN-02 | An aquarium shall accept at most 10 phones (configurable).                                                                                           | T            |
+| FR-JOIN-03 | A phone that joins the same aquarium again shall keep its session; joining another aquarium shall leave the first.                                   | T            |
+| FR-JOIN-04 | A phone shall be able to leave the aquarium.                                                                                                         | T            |
 
 ### 3.3 Capture and preview
 
@@ -113,11 +113,11 @@ AI segmentation, TV brands other than LG webOS (unless they need no extra work),
 | FR-TV-02 | Creatures shall move according to their kind, with smooth body deformation.                                                                                    | D            |
 | FR-TV-03 | The TV shall receive changes in real time, resynchronize after reconnecting and show a discreet offline indicator.                                             | T, D         |
 | FR-TV-04 | The TV shall be fully usable with the remote: OK, Back, arrows and the color keys.                                                                             | D            |
-| FR-TV-05 | A browser page (`/pc/`) shall offer the same actions as clickable controls, for a mouse or touch screen.                                                       | T            |
+| FR-TV-05 | The site root shall offer the same actions as clickable controls, for a mouse or touch screen; `/tv/` keeps the remote control.                                | T            |
 | FR-TV-06 | A live aquarium shall play a generated sea ambience that can be turned off; the choice shall be remembered.                                                    | T, D         |
 | FR-TV-07 | Demo creatures and a seabed in depth (swaying kelp and sea grass, rocks, corals, shells, starfish and a foreground) shall keep the scene looking like the sea. | D            |
 | FR-TV-08 | The menu shall offer a light 720p rendering and an FPS counter; both choices shall be remembered.                                                              | T, D         |
-| FR-TV-09 | The phone count and the `/pc/` controls shall fade out after a few seconds without input and return on any input.                                              | T            |
+| FR-TV-09 | The phone count and the clickable controls shall fade out after a few seconds without input and return on any input.                                           | T            |
 
 ## 4. Non-functional requirements
 

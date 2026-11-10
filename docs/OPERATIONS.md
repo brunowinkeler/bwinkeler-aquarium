@@ -41,7 +41,7 @@ drives the whole flow in Chromium: the TV at `/tv/` creates an aquarium, a phone
 sends a large photographed drawing, sees it confirmed on the TV and lists it, opens the printable
 templates and sends a photographed template (corners and kind found automatically), sends a
 cropped photo as it is, removes a creature, then the TV ends the aquarium; a second test drives
-`/pc/` with clicks only (code panel, sound, quality and FPS options, idle fade, menu). axe checks the phone screens. Each run
+the site root with clicks only (code panel, sound, quality and FPS options, idle fade, menu). axe checks the phone screens. Each run
 creates two aquariums, so wait a minute between runs (3 creations per minute per IP). CI runs
 `validate`, checks that the icons and the templates are reproducible and runs the end-to-end tests
 on every push to `main` and on pull requests.
