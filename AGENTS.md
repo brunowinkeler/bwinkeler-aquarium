@@ -12,7 +12,8 @@ Read these files before changing this repository:
 ## Language
 
 Code, comments, documentation, metadata, commits, API error messages and domains are written in
-English. The interfaces are bilingual, Brazilian Portuguese first (ADR 005).
+English. The interfaces are bilingual: the phone app opens in Brazilian Portuguese and the site root
+screen in English (ADR 005).
 
 ## Architecture
 
