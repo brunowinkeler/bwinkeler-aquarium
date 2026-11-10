@@ -168,6 +168,14 @@ test('the /pc/ page is driven with clicks', async ({ browser }) => {
   await expect(pc.getByRole('button', { name: 'Contador de FPS: ligado' })).toBeVisible();
   await expect(pc.getByText(/^\d+ FPS · 1280×720$/)).toBeVisible();
 
+  // The toolbar and the phone count fade out while the mouse rests, and come back when it moves.
+  await pc.getByRole('button', { name: 'Voltar ao aquário' }).click();
+  const phones = pc.getByText('nenhum celular');
+  await expect(phones).toHaveCSS('opacity', '0', { timeout: 10_000 });
+  await pc.mouse.move(800, 450);
+  await expect(phones).toHaveCSS('opacity', '1');
+
+  await pc.getByRole('button', { name: 'Menu' }).click();
   await pc.getByRole('button', { name: 'Encerrar aquário' }).click();
   await expect(pc.getByText('O aquário terminou.')).toBeVisible();
 });

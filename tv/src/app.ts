@@ -145,6 +145,9 @@ export class TvApp {
       this.renderFps();
     }, 1000);
     if (this.platform.pointer) this.setUpPointer();
+    for (const type of ['mousemove', 'mousedown', 'touchstart', 'keydown']) {
+      document.addEventListener(type, () => this.wake(), true);
+    }
     this.renderSound();
     this.renderQuality();
     this.renderFps();
@@ -186,14 +189,12 @@ export class TvApp {
     this.toolMenu.addEventListener('click', () =>
       this.menuOpen ? this.closeMenu() : this.openMenu(),
     );
-    for (const type of ['mousemove', 'mousedown', 'touchstart', 'keydown']) {
-      document.addEventListener(type, () => this.wake(), true);
-    }
     for (const type of ['fullscreenchange', 'webkitfullscreenchange']) {
       document.addEventListener(type, () => this.renderTools());
     }
   }
 
+  /** The toolbar, the phone count and the cursor fade out after a few seconds without input. */
   private wake(): void {
     document.body.classList.remove('idle');
     window.clearTimeout(this.idleTimer);
@@ -274,6 +275,7 @@ export class TvApp {
     this.ended.hidden = true;
     this.chip.hidden = true;
     this.homeError.textContent = error ? text(error) : '';
+    document.body.classList.remove('idle');
     this.ambience.stop();
     this.renderTools();
     this.createButton.focus();
@@ -314,7 +316,7 @@ export class TvApp {
     this.ended.hidden = true;
     this.updateChip();
     this.renderTools();
-    if (this.platform.pointer) this.wake();
+    this.wake();
     if (this.soundOn) this.ambience.start();
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (this.relay) this.relay.stop();
@@ -388,8 +390,10 @@ export class TvApp {
 
   private setPhones(count: number, announce: boolean): void {
     if (announce && count > this.phoneCount) this.toast(text('toastPhone'));
+    const changed = count !== this.phoneCount;
     this.phoneCount = count;
     this.updateChip();
+    if (changed) this.wake();
     if (count > 0 && this.panelOpen && this.panelAuto) this.closePanel();
   }
 

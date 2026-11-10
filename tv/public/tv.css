@@ -140,6 +140,8 @@ body {
   border-radius: 99vh;
   background: rgba(7, 34, 54, 0.75);
   font-size: 1.1em;
+  -webkit-transition: opacity 0.4s;
+  transition: opacity 0.4s;
 }
 
 .join__close {
@@ -184,8 +186,9 @@ body {
   background: rgba(30, 127, 174, 0.95);
 }
 
-/* Pointer mode: controls and cursor fade out while the mouse rests. */
-.idle .toolbar {
+/* After a few seconds without input, the controls, the phone count and the cursor fade out. */
+.idle .toolbar,
+.idle .chip {
   opacity: 0;
   pointer-events: none;
 }
