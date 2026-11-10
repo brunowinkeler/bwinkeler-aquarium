@@ -1,5 +1,6 @@
 import { bodyWave, creaturePose, type Pose } from './pose.js';
-import { paintBackdrop, paintBubbles, paintRays, paintSeaweed } from './scene.js';
+import { paintBubbles } from './scene.js';
+import { Seabed } from './seabed.js';
 import { spriteSize, type SimCreature, type World } from './world.js';
 
 interface Sprite {
@@ -23,7 +24,7 @@ function createCanvas(width: number, height: number): HTMLCanvasElement {
 export class Canvas2DRenderer {
   private readonly context: CanvasRenderingContext2D;
   private readonly sprites = new Map<string, Sprite>();
-  private backdrop: HTMLCanvasElement | null = null;
+  private seabed: Seabed | null = null;
   private width = 0;
   private height = 0;
   private pixelRatio = 1;
@@ -42,7 +43,7 @@ export class Canvas2DRenderer {
     this.pixelRatio = pixelRatio;
     this.canvas.width = Math.max(1, Math.round(width * pixelRatio));
     this.canvas.height = Math.max(1, Math.round(height * pixelRatio));
-    this.backdrop = null;
+    this.seabed = null;
   }
 
   setImage(id: string, source: CanvasImageSource, width: number, height: number): void {
@@ -60,28 +61,20 @@ export class Canvas2DRenderer {
   render(world: World): void {
     const context = this.context;
     context.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
-    context.drawImage(this.getBackdrop(), 0, 0, this.width, this.height);
-    paintRays(context, this.width, this.height, world.time);
-    paintSeaweed(context, this.width, this.height, world.time);
+    const seabed = this.getSeabed();
+    seabed.paintBehind(context, world.time);
 
     const ordered = world.creatures
       .slice()
       .sort((a, b) => a.personality.depth - b.personality.depth);
     for (const creature of ordered) this.drawCreature(world, creature);
+    seabed.paintFront(context, world.time);
     paintBubbles(context, world.bubbles);
   }
 
-  private getBackdrop(): HTMLCanvasElement {
-    if (!this.backdrop) {
-      const backdrop = createCanvas(this.width * this.pixelRatio, this.height * this.pixelRatio);
-      const context = backdrop.getContext('2d');
-      if (context) {
-        context.scale(this.pixelRatio, this.pixelRatio);
-        paintBackdrop(context, this.width, this.height);
-      }
-      this.backdrop = backdrop;
-    }
-    return this.backdrop;
+  private getSeabed(): Seabed {
+    if (!this.seabed) this.seabed = new Seabed(this.width, this.height, this.pixelRatio);
+    return this.seabed;
   }
 
   private sourceFor(sprite: Sprite, fog: number): CanvasImageSource {
