@@ -1,6 +1,6 @@
 # ADR 005: Portuguese-first bilingual interface
 
-- Status: accepted
+- Status: accepted; amended 2026-11-10 (the site root opens in English)
 - Date: 2026-11-07
 
 ## Context
@@ -15,6 +15,10 @@ commits; it was never meant to force the product interface into English.
 2. Keep every user-visible string in typed catalogues, so a missing translation is a type error.
 3. Keep code, identifiers, comments, documentation, ADRs, commit messages and API error messages in
    English. The apps map API error codes to localized text.
+4. Amendment (2026-11-10): the aquarium screen at the site root, the public face of the product,
+   opens in English; `/tv/` follows the TV's language and the phone app keeps `pt-BR` first. The
+   start screens of the site root and of the phone app switch language, and the choice is stored
+   on the device under `aquarium.language`, which both apps read.
 
 ## Consequences
 

@@ -137,7 +137,7 @@ AI segmentation, TV brands other than LG webOS (unless they need no extra work),
 | NFR-PRIV-02  | Logs shall never contain tokens, cookies, join codes or IP addresses.                                                                                                      | I            |
 | NFR-OPS-01   | The Worker shall expose `/health/live` and `/health/ready`.                                                                                                                | T            |
 | NFR-OPS-02   | A release shall be deployable and revertible with Wrangler.                                                                                                                | D            |
-| NFR-L10N-01  | The interface shall be in Brazilian Portuguese by default, with English available; code and documentation stay in English.                                                 | I            |
+| NFR-L10N-01  | The phone app shall open in Brazilian Portuguese and the site root screen in English, each switchable and remembered per device; code and documentation stay in English.   | T, I         |
 | NFR-MAINT-01 | `npm run validate` shall pass in CI for every change.                                                                                                                      | T            |
 
 ## 5. Traceability

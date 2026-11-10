@@ -1,8 +1,9 @@
 # Aquarium user guide
 
-Children draw sea creatures on paper, a phone photographs them and they swim on the TV. The app
-opens in Portuguese; the button at the top right switches to English (labels below are the English
-ones).
+Children draw sea creatures on paper, a phone photographs them and they swim on the TV. The screen
+at `aquarium.bwinkeler.com` opens in English and the phone app in Portuguese; the button at the top
+right of their start screens switches language, and the device remembers it. `/tv/` follows the
+TV's language. Labels below are the English ones.
 
 ## What you need
 
