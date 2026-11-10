@@ -1,6 +1,6 @@
 {
   "name": "bwinkeler-aquarium",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "Aquarium (service_id: aquarium): children's paper drawings swim on a TV. Part of the bwinkeler.com platform.",
