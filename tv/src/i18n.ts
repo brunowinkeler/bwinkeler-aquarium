@@ -28,6 +28,7 @@ const PT = {
   toolExitFullscreen: 'Sair da tela cheia',
   toolMenu: 'Menu',
   close: 'Fechar',
+  languageSwitch: 'English',
   ended: 'O aquário terminou.',
   expired: 'O aquário expirou.',
   replaced: 'Este aquário foi aberto em outra tela.',
@@ -73,6 +74,7 @@ const EN: Record<TextKey, string> = {
   toolExitFullscreen: 'Exit full screen',
   toolMenu: 'Menu',
   close: 'Close',
+  languageSwitch: 'Português',
   ended: 'The aquarium has ended.',
   expired: 'The aquarium has expired.',
   replaced: 'This aquarium was opened on another screen.',
@@ -86,15 +88,29 @@ const EN: Record<TextKey, string> = {
   errorLimit: 'The limit of new aquariums was reached. Try again later.',
 };
 
-function pickLanguage(): 'pt' | 'en' {
+/** The same values as the phone app, which stores its choice under the same key. */
+export type Language = 'pt-BR' | 'en';
+
+/** `?lang=` first, then the choice saved on this device, then `fallback` or the browser. */
+export function pickLanguage(saved: string | null, fallback: Language | null): Language {
   const forced = /[?&]lang=(pt|en)/.exec(window.location.search);
-  if (forced && forced[1] === 'en') return 'en';
-  if (forced) return 'pt';
-  return (navigator.language || '').toLowerCase().indexOf('en') === 0 ? 'en' : 'pt';
+  if (forced) return forced[1] === 'en' ? 'en' : 'pt-BR';
+  if (saved === 'pt-BR' || saved === 'en') return saved;
+  if (fallback) return fallback;
+  return (navigator.language || '').toLowerCase().indexOf('en') === 0 ? 'en' : 'pt-BR';
 }
 
-export const language = pickLanguage();
-const catalogue: Record<TextKey, string> = language === 'en' ? EN : PT;
+let current: Language = pickLanguage(null, null);
+let catalogue: Record<TextKey, string> = current === 'en' ? EN : PT;
+
+export function currentLanguage(): Language {
+  return current;
+}
+
+export function setLanguage(language: Language): void {
+  current = language;
+  catalogue = language === 'en' ? EN : PT;
+}
 
 export function text(key: TextKey, params?: { [name: string]: string | number }): string {
   const template = catalogue[key];
@@ -116,5 +132,6 @@ export function applyTexts(root: ParentNode): void {
     const node = nodes[i] as HTMLElement;
     node.textContent = text(node.getAttribute('data-text') as TextKey);
   }
-  document.documentElement.lang = language === 'en' ? 'en' : 'pt-BR';
+  document.documentElement.lang = current;
+  document.title = text('title');
 }

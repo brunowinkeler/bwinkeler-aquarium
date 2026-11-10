@@ -186,6 +186,12 @@ body {
   background: rgba(30, 127, 174, 0.95);
 }
 
+.language {
+  position: fixed;
+  top: 2vh;
+  right: 2vw;
+}
+
 /* After a few seconds without input, the controls, the phone count and the cursor fade out. */
 .idle .toolbar,
 .idle .chip {

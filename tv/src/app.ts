@@ -10,7 +10,15 @@ import {
   socketUrl,
   TvApiError,
 } from './api';
-import { applyTexts, phonesText, text, type TextKey } from './i18n';
+import {
+  applyTexts,
+  currentLanguage,
+  phonesText,
+  pickLanguage,
+  setLanguage,
+  text,
+  type TextKey,
+} from './i18n';
 import type { TvKey, TvPlatform } from './platform';
 import { drawQr } from './qr';
 import { RelayClient, type Connection } from './relay';
@@ -20,6 +28,8 @@ const STORAGE_KEY = 'aquarium.tv';
 const SOUND_KEY = 'aquarium.sound';
 const QUALITY_KEY = 'aquarium.quality';
 const FPS_KEY = 'aquarium.fps';
+// Shared with the phone app, so one device keeps one language.
+const LANGUAGE_KEY = 'aquarium.language';
 const CODE_REFRESH_MARGIN_MS = 60 * 1000;
 const TOAST_MS = 4000;
 const IDLE_MS = 4000;
@@ -83,14 +93,18 @@ export class TvApp {
   private soundOn: boolean;
   private light: boolean;
   private showFps: boolean;
+  private homeErrorKey: TextKey | null = null;
+  private endedKey: TextKey = 'ended';
   private idleTimer = 0;
   private readonly ambience = new SeaAmbience();
   private readonly scene: AquariumScene;
   private readonly home = byId('home');
   private readonly createButton = byId<HTMLButtonElement>('create');
   private readonly homeError = byId('home-error');
+  private readonly language = byId<HTMLButtonElement>('language');
   private readonly join = byId('join');
   private readonly joinClose = byId<HTMLButtonElement>('join-close');
+  private readonly joinOpen = byId('join-open');
   private readonly joinCodeText = byId('join-code');
   private readonly qr = byId<HTMLCanvasElement>('qr');
   private readonly chip = byId('chip');
@@ -112,8 +126,8 @@ export class TvApp {
   private readonly debug = byId('debug');
 
   constructor(private readonly platform: TvPlatform) {
-    applyTexts(document);
-    byId('join-open').textContent = text('joinOpen', { host: joinAddress() });
+    // The site root opens in English; /tv/ follows the TV's own language.
+    setLanguage(pickLanguage(platform.load(LANGUAGE_KEY), platform.pointer ? 'en' : null));
     this.soundOn = platform.load(SOUND_KEY) !== 'off';
     this.light = platform.load(QUALITY_KEY) === 'light';
     this.showFps = platform.load(FPS_KEY) === 'on';
@@ -148,9 +162,7 @@ export class TvApp {
     for (const type of ['mousemove', 'mousedown', 'touchstart', 'keydown']) {
       document.addEventListener(type, () => this.wake(), true);
     }
-    this.renderSound();
-    this.renderQuality();
-    this.renderFps();
+    this.renderTexts();
     const saved = this.loadCredentials();
     if (saved) this.goLive(saved, false);
     else this.showHome();
@@ -189,6 +201,7 @@ export class TvApp {
     this.toolMenu.addEventListener('click', () =>
       this.menuOpen ? this.closeMenu() : this.openMenu(),
     );
+    this.language.addEventListener('click', () => this.toggleLanguage());
     for (const type of ['fullscreenchange', 'webkitfullscreenchange']) {
       document.addEventListener(type, () => this.renderTools());
     }
@@ -205,6 +218,10 @@ export class TvApp {
 
   private renderTools(): void {
     this.toolbar.hidden = !this.platform.pointer || this.screen !== 'live';
+    // Outside a live aquarium the same corner holds the language switch.
+    this.language.hidden = !this.platform.pointer || this.screen === 'live';
+    this.language.textContent = text('languageSwitch');
+    this.language.lang = currentLanguage() === 'en' ? 'pt-BR' : 'en';
     this.toolCode.textContent = text(this.panelOpen ? 'toolHideCode' : 'toolCode');
     this.toolFullscreen.textContent = text(
       fullscreenElement() ? 'toolExitFullscreen' : 'toolFullscreen',
@@ -252,6 +269,26 @@ export class TvApp {
     this.renderFps();
   }
 
+  private toggleLanguage(): void {
+    const next = currentLanguage() === 'en' ? 'pt-BR' : 'en';
+    setLanguage(next);
+    this.platform.save(LANGUAGE_KEY, next);
+    this.renderTexts();
+  }
+
+  /** Every text on screen, at start and after a language switch. */
+  private renderTexts(): void {
+    applyTexts(document);
+    this.joinOpen.textContent = text('joinOpen', { host: joinAddress() });
+    this.homeError.textContent = this.homeErrorKey ? text(this.homeErrorKey) : '';
+    this.endedText.textContent = text(this.endedKey);
+    this.updateChip();
+    this.renderTools();
+    this.renderSound();
+    this.renderQuality();
+    this.renderFps();
+  }
+
   private loadCredentials(): Credentials | null {
     const raw = this.platform.load(STORAGE_KEY);
     if (!raw) return null;
@@ -274,6 +311,7 @@ export class TvApp {
     this.home.hidden = false;
     this.ended.hidden = true;
     this.chip.hidden = true;
+    this.homeErrorKey = error || null;
     this.homeError.textContent = error ? text(error) : '';
     document.body.classList.remove('idle');
     this.ambience.stop();
@@ -381,9 +419,8 @@ export class TvApp {
     this.screen = 'ended';
     this.renderTools();
     document.body.classList.remove('idle');
-    this.endedText.textContent = text(
-      reason === 'expired' ? 'expired' : reason === 'replaced' ? 'replaced' : 'ended',
-    );
+    this.endedKey = reason === 'expired' ? 'expired' : reason === 'replaced' ? 'replaced' : 'ended';
+    this.endedText.textContent = text(this.endedKey);
     this.ended.hidden = false;
     this.endedButton.focus();
   }

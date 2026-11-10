@@ -145,7 +145,13 @@ test('the site root is driven with clicks', async ({ browser }) => {
   // /pc/ was its address before the site root.
   await pc.goto('/pc/');
   await expect(pc).toHaveURL((url) => url.pathname === '/');
+  // English by default, whatever the browser's language; the switch is remembered on the device.
+  await expect(pc.getByRole('button', { name: 'New aquarium' })).toBeVisible();
+  await pc.getByRole('button', { name: 'Português' }).click();
+  await expect(pc.getByRole('button', { name: 'English' })).toBeVisible();
+  await pc.reload();
   await pc.getByRole('button', { name: 'Novo aquário' }).click();
+  await expect(pc.getByRole('button', { name: 'English' })).toBeHidden();
   const code = pc.getByTestId('join-code');
   await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/, { timeout: 20_000 });
   expect((await tvStatus(pc)).pointer).toBe(true);
