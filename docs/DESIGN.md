@@ -2,7 +2,7 @@
 
 Living design document for Aquarium (`service_id: aquarium`), a product of the `bwinkeler.com` platform. It follows the platform contract `BW-PLATFORM-ARCH-001` v1.3 (`bwinkeler-infra/ARCHITECTURE.md`); where the two conflict, the platform contract and its precedence rules prevail, and every deviation is listed in [5. Platform conformance](#5-platform-conformance). Platform facts were verified against official documentation and source code between 2026-11-03 and 2026-11-07.
 
-**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build, plus `/pc/` with clickable controls (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a procedural backdrop.
+**Status:** design approved. Implemented: repository, docs and CI (Phase 1); `shared`, `engine` (Canvas 2D renderer) and `extractor` (free sheet and printed ArUco templates) from Phase 2; the Worker (Phase 3, deployed); the TV app as the `/tv/` browser build, plus `/pc/` with clickable controls (Phase 4; the webOS package, the WebGL renderer and the background video wait for the spike); the PWA with the printable templates (Phase 5); `deploy.yaml` and the end-to-end Playwright test (Phase 6). Until a background video exists, the engine paints a layered procedural seabed.
 **Last updated:** 2026-11-08.
 
 | Field             | Value                                                        |
@@ -565,16 +565,18 @@ Right after creation, with the join panel open. Once the first phone joins, the 
 - **Build:** Vite with esbuild target `chrome53` and one IIFE bundle (no ES modules or SystemJS at runtime), an explicit polyfill entry (selected core-js modules), `base: './'`, and `crossorigin` attributes stripped. CI runs `es-check es6` on the output. Fallback: `@vitejs/plugin-legacy`.
 - **`appinfo.json`:** `id` `com.bwinkeler.aquarium` (lowercase, no `-`), `resolution` from spike 1, `disableBackHistoryAPI: true`, 80×80 `icon`, 130×130 `largeIcon`, 1920×1080 `splashBackground`.
 - **Platform adapter:** remote keys, Back and exit, the keep-awake video, persistent storage and packaging sit behind `TvPlatform` ([13.3](#133-other-tv-brands-and-systems)); the rest of the app never calls webOS directly.
-- **Keys:** OK (`13`) shows the join code; Back (`461`) closes an open panel or opens the menu (show code, disconnect phones, end aquarium, exit with `webOS.platformBack()`); Red (`403`) toggles the FPS/debug overlay.
+- **Keys:** OK (`13`) shows the join code; Back (`461`) closes an open panel or opens the menu (show code, sound, quality, FPS counter, disconnect phones, end aquarium, exit with `webOS.platformBack()`); Red (`403`) toggles the debug overlay.
 - **Session:** the `aquariumId` and the TV token are kept in `localStorage`. On launch the app tries to resume; a `410` clears them and shows the home screen.
 - **Lifecycle:** rendering pauses on `visibilitychange` and resyncs on resume.
 - **RelayClient:** WebSocket `/ws/tv/{aquariumId}` with `auth` as the first message, exponential backoff and jitter, app-level ping every 30 s, full snapshot resync after reconnecting, revision-gap detection, polling fallback, discreet offline indicator.
 - **Images:** fetched with XHR (`Authorization` header) from `/api/tv/creatures/{id}/image` as a Blob, decoded with `createImageBitmap` or an object URL, and uploaded as a WebGL texture.
 - **Offline start:** creature metadata and PNGs are cached in IndexedDB and cleared when the aquarium ends.
 - **Empty aquarium:** six hand-drawn demo creatures swim until drawings arrive, and the first three always stay, so a single drawing still looks like the sea; the join panel stays open until the first phone joins.
-- **Seabed:** the backdrop paints rocks, branching, fan, brain and tube corals, shells and starfish once per resize into the cached layer, so they cost nothing per frame.
+- **Seabed:** three layers painted once per size at the canvas pixel ratio. The backdrop holds the water, two hazy reef silhouettes, far kelp and corals, and sand with dunes, ripples and pebbles under a vignette; the decor layer holds the corals, rocks, shells and starfish with soft shadows; the foreground (a dark kelp, a rock and a red coral at the edges) is drawn over the creatures. Kelp, sea grass and sea lettuce are painted once into sprites and sway in 8 to 20 horizontal slices, each shifted more toward the tip, behind and in front of the corals. Sizes follow the height of a 16:9 frame, so the 4:3 phone preview is not crowded.
+- **Quality and FPS:** "Quality: light (720p)" in the menu draws the scene at most 720 lines high (the renderer's pixel ratio becomes 720 / height) and lets the browser stretch the canvas; "FPS counter" shows the frame rate and the canvas size in a corner. Both choices are remembered.
+- **Idle:** after 4 seconds without input the phone count fades out, together with the `/pc/` toolbar and cursor; any key, mouse move or touch, or a phone joining or leaving, brings them back.
 - **Sound:** a generated ambience (Web Audio: slow pad chords, sparse bells, filtered-noise waves and bubbles, a feedback delay instead of reverb) plays while the aquarium is live; nothing is recorded, so nothing needs a license. Browsers keep it suspended until the first click or key press. "Sound" in the menu, and in the `/pc/` toolbar, turns it off and is remembered.
-- **Browser build:** the same bundle at `/tv/` runs in other TVs' browsers, on a PC over HDMI, or on a Raspberry Pi in kiosk mode. `/pc/` serves it with `data-input="pointer"`: buttons at the top right (show code, sound, full screen, menu) replace the OK and Back hints, the join panel gets a close button, and the toolbar and cursor fade out while the mouse rests.
+- **Browser build:** the same bundle at `/tv/` runs in other TVs' browsers, on a PC over HDMI, or on a Raspberry Pi in kiosk mode. `/pc/` serves it with `data-input="pointer"`: buttons at the top right (show code, sound, full screen, menu) replace the OK and Back hints, and the join panel gets a close button.
 
 ### 10.5 Background video asset
 
@@ -640,7 +642,7 @@ stateDiagram-v2
 - One WebGL 1 grid mesh per creature (about 16×4 cells); the vertex shader applies the deformation for the creature's kind.
 - Textures up to 512 px, premultiplied alpha, no mipmaps; draw order sorted by depth.
 - Fixed 60 Hz simulation step with a clamped frame delta; no per-frame allocations.
-- Adaptive quality: if FPS stays below 50, drop the internal resolution to 1280×720, disable caustics and reduce mesh density.
+- Adaptive quality: if FPS stays below 50, drop the internal resolution to 1280×720, disable caustics and reduce mesh density. Until then, the menu offers the 720p rendering by hand.
 - The Canvas 2D fallback approximates the wave by drawing vertical slices of the sprite.
 
 ## 12. Backend (Cloudflare Worker)
