@@ -18,6 +18,8 @@ import { AquariumScene } from './scene';
 
 const STORAGE_KEY = 'aquarium.tv';
 const SOUND_KEY = 'aquarium.sound';
+const QUALITY_KEY = 'aquarium.quality';
+const FPS_KEY = 'aquarium.fps';
 const CODE_REFRESH_MARGIN_MS = 60 * 1000;
 const TOAST_MS = 4000;
 const IDLE_MS = 4000;
@@ -28,7 +30,7 @@ interface Credentials {
 }
 
 type Screen = 'home' | 'live' | 'ended';
-type MenuAction = 'code' | 'sound' | 'disconnect' | 'end' | 'close';
+type MenuAction = 'code' | 'sound' | 'quality' | 'fps' | 'disconnect' | 'end' | 'close';
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const node = document.getElementById(id);
@@ -79,6 +81,8 @@ export class TvApp {
   private debugOpen = false;
   private creating = false;
   private soundOn: boolean;
+  private light: boolean;
+  private showFps: boolean;
   private idleTimer = 0;
   private readonly ambience = new SeaAmbience();
   private readonly scene: AquariumScene;
@@ -97,6 +101,9 @@ export class TvApp {
   private readonly toolMenu = byId<HTMLButtonElement>('tool-menu');
   private readonly menu = byId('menu');
   private readonly menuSound = byId<HTMLButtonElement>('menu-sound');
+  private readonly menuQuality = byId<HTMLButtonElement>('menu-quality');
+  private readonly menuFps = byId<HTMLButtonElement>('menu-fps');
+  private readonly fpsMeter = byId('fps');
   private readonly ended = byId('ended');
   private readonly endedText = byId('ended-text');
   private readonly endedButton = byId<HTMLButtonElement>('ended-new');
@@ -108,6 +115,8 @@ export class TvApp {
     applyTexts(document);
     byId('join-open').textContent = text('joinOpen', { host: apiHost() });
     this.soundOn = platform.load(SOUND_KEY) !== 'off';
+    this.light = platform.load(QUALITY_KEY) === 'light';
+    this.showFps = platform.load(FPS_KEY) === 'on';
     this.scene = new AquariumScene(
       byId<HTMLCanvasElement>('scene'),
       () => (this.credentials ? this.credentials.token : null),
@@ -115,6 +124,7 @@ export class TvApp {
         if (this.relay) this.relay.send({ type: 'displayed', id });
       },
     );
+    this.scene.setLight(this.light);
   }
 
   start(): void {
@@ -130,9 +140,14 @@ export class TvApp {
         this.menuAction(button.getAttribute('data-action') as MenuAction),
       );
     }
-    window.setInterval(() => this.renderDebug(), 1000);
+    window.setInterval(() => {
+      this.renderDebug();
+      this.renderFps();
+    }, 1000);
     if (this.platform.pointer) this.setUpPointer();
     this.renderSound();
+    this.renderQuality();
+    this.renderFps();
     const saved = this.loadCredentials();
     if (saved) this.goLive(saved, false);
     else this.showHome();
@@ -149,6 +164,9 @@ export class TvApp {
       joinCode: this.joinCode ? this.joinCode.code : null,
       creatures: this.scene.creatures(),
       fps: this.scene.fps,
+      resolution: this.scene.resolution(),
+      quality: this.light ? 'light' : 'full',
+      fpsShown: this.showFps,
       pointer: this.platform.pointer,
       sound: this.soundOn ? this.ambience.state : 'off',
     };
@@ -204,6 +222,33 @@ export class TvApp {
     this.renderSound();
     if (this.soundOn && this.screen === 'live') this.ambience.start();
     else this.ambience.stop();
+  }
+
+  private renderQuality(): void {
+    this.menuQuality.textContent = text(this.light ? 'qualityLight' : 'qualityFull');
+  }
+
+  private toggleQuality(): void {
+    this.light = !this.light;
+    this.platform.save(QUALITY_KEY, this.light ? 'light' : null);
+    this.scene.setLight(this.light);
+    this.renderQuality();
+    this.renderFps();
+  }
+
+  private renderFps(): void {
+    this.menuFps.textContent = text(this.showFps ? 'fpsOn' : 'fpsOff');
+    this.fpsMeter.hidden = !this.showFps;
+    if (this.showFps) {
+      this.fpsMeter.textContent =
+        this.scene.fps + ' FPS · ' + this.scene.resolution().replace('x', '×');
+    }
+  }
+
+  private toggleFps(): void {
+    this.showFps = !this.showFps;
+    this.platform.save(FPS_KEY, this.showFps ? 'on' : null);
+    this.renderFps();
   }
 
   private loadCredentials(): Credentials | null {
@@ -418,8 +463,17 @@ export class TvApp {
   }
 
   private menuAction(action: MenuAction): void {
+    // Settings change in place, so the menu stays open.
     if (action === 'sound') {
       this.toggleSound();
+      return;
+    }
+    if (action === 'quality') {
+      this.toggleQuality();
+      return;
+    }
+    if (action === 'fps') {
+      this.toggleFps();
       return;
     }
     const credentials = this.credentials;

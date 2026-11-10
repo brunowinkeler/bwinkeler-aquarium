@@ -130,6 +130,9 @@ export interface TvStatus {
   panelOpen: boolean;
   joinCode: string | null;
   creatures: string[];
+  resolution: string;
+  quality: 'full' | 'light';
+  fpsShown: boolean;
   pointer: boolean;
   sound: 'off' | 'waiting' | 'playing' | 'unavailable';
 }

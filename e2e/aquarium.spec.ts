@@ -136,7 +136,7 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
 
 test('the /pc/ page is driven with clicks', async ({ browser }) => {
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 1600, height: 900 },
     locale: 'pt-BR',
   });
   const pc = await context.newPage();
@@ -158,7 +158,16 @@ test('the /pc/ page is driven with clicks', async ({ browser }) => {
   await expect(pc.getByRole('button', { name: 'Som: desligado' })).toBeVisible();
   expect((await tvStatus(pc)).sound).toBe('off');
 
+  // Light quality draws 720 lines and lets the browser scale them up.
   await pc.getByRole('button', { name: 'Menu' }).click();
+  expect((await tvStatus(pc)).resolution).toBe('1600x900');
+  await pc.getByRole('button', { name: 'Qualidade: alta' }).click();
+  await expect(pc.getByRole('button', { name: 'Qualidade: leve (720p)' })).toBeVisible();
+  expect((await tvStatus(pc)).resolution).toBe('1280x720');
+  await pc.getByRole('button', { name: 'Contador de FPS: desligado' }).click();
+  await expect(pc.getByRole('button', { name: 'Contador de FPS: ligado' })).toBeVisible();
+  await expect(pc.getByText(/^\d+ FPS · 1280×720$/)).toBeVisible();
+
   await pc.getByRole('button', { name: 'Encerrar aquário' }).click();
   await expect(pc.getByText('O aquário terminou.')).toBeVisible();
 });

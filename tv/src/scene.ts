@@ -61,10 +61,11 @@ export class AquariumScene {
   private demo: string[] = [];
   private frames = 0;
   private frameTime = 0;
+  private light = false;
   fps = 0;
 
   constructor(
-    canvas: HTMLCanvasElement,
+    private readonly canvas: HTMLCanvasElement,
     private readonly token: () => string | null,
     private readonly onShown: (id: string) => void,
   ) {
@@ -73,12 +74,8 @@ export class AquariumScene {
   }
 
   start(): void {
-    const fit = () => {
-      this.world.resize(window.innerWidth, window.innerHeight);
-      this.renderer.resize(window.innerWidth, window.innerHeight, 1);
-    };
-    fit();
-    window.addEventListener('resize', fit);
+    this.fit();
+    window.addEventListener('resize', () => this.fit());
     this.updateDemo();
     startAnimation((seconds) => {
       this.world.step(seconds);
@@ -96,6 +93,24 @@ export class AquariumScene {
   /** IDs of the real creatures that are swimming. */
   creatures(): string[] {
     return Object.keys(this.real);
+  }
+
+  /** Light quality draws at most 720 lines; the browser stretches the canvas to the screen. */
+  setLight(light: boolean): void {
+    this.light = light;
+    this.fit();
+  }
+
+  /** The canvas size in device pixels, such as `1280x720`. */
+  resolution(): string {
+    return this.canvas.width + 'x' + this.canvas.height;
+  }
+
+  private fit(): void {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    this.world.resize(width, height);
+    this.renderer.resize(width, height, this.light ? Math.min(1, 720 / height) : 1);
   }
 
   sync(creatures: readonly Creature[]): void {
