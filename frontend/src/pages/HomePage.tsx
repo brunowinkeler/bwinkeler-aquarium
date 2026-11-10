@@ -27,7 +27,7 @@ export function HomePage() {
   const onLeave = async () => {
     try {
       await leave();
-      void navigate('/join', { replace: true });
+      void navigate('/', { replace: true });
     } catch (failure) {
       setError(errorMessageKey(failure));
     }

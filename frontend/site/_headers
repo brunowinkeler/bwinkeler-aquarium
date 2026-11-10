@@ -7,20 +7,20 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
 
-/assets/*
+/join/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-/icons/*
+/join/icons/*
   Cache-Control: public, max-age=604800
 
 /sw.js
   Cache-Control: no-cache
 
-/manifest.webmanifest
+/join/sw.js
+  Cache-Control: no-cache
+
+/join/manifest.webmanifest
   Cache-Control: no-cache
 
 /tv/*
-  Cache-Control: no-cache
-
-/pc/*
   Cache-Control: no-cache

@@ -1,0 +1,11 @@
+# The site root is the aquarium screen; the phone app lives under /join/.
+/pc / 301
+/new /join/new 301
+/creatures /join/creatures 301
+/templates /join/templates 301
+# Pages of the phone app are drawn by its single page (/join/index.html, served as /join/).
+/join/new /join/ 200
+/join/creatures /join/ 200
+/join/templates /join/ 200
+/pc/* / 301
+/templates/* /join/templates/:splat 301

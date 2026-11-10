@@ -45,7 +45,7 @@ interface WakeLockNavigator {
   wakeLock?: { request(type: 'screen'): Promise<unknown> };
 }
 
-/** The `/tv/` and `/pc/` builds in any browser: keyboard keys, Screen Wake Lock, localStorage. */
+/** The `/tv/` and root builds in any browser: keyboard keys, Screen Wake Lock, localStorage. */
 export function browserPlatform(pointer: boolean): TvPlatform {
   return {
     name: 'browser',

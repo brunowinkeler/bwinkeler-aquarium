@@ -13,6 +13,7 @@ const KINDS = Object.keys(NAMES) as TemplateKind[];
 
 export function TemplatesPage() {
   const { t, language } = useI18n();
+  const folder = `${import.meta.env.BASE_URL}templates/${language}`;
   return (
     <section className="page" aria-labelledby="templates-title">
       <h1 id="templates-title">{t('templates.title')}</h1>
@@ -21,10 +22,10 @@ export function TemplatesPage() {
       <ul className="templates">
         {KINDS.map((kind) => (
           <li key={kind}>
-            <a className="template" href={`/templates/${language}/${kind}.pdf`} download>
+            <a className="template" href={`${folder}/${kind}.pdf`} download>
               <img
                 className="template__preview"
-                src={`/templates/${language}/${kind}.svg`}
+                src={`${folder}/${kind}.svg`}
                 alt=""
                 width="297"
                 height="210"

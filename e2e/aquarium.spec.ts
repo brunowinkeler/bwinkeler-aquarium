@@ -43,7 +43,7 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   const { tv, code } = await openTv(browser);
   const phone = await openPhone(browser);
 
-  await phone.goto(`/join?code=${code.replace('-', '')}`);
+  await phone.goto(`/join/?code=${code.replace('-', '')}`);
   await expectAccessible(phone);
   await phone.getByRole('button', { name: 'Entrar' }).click();
   await expect(phone.getByTestId('tv-status')).toHaveText('TV conectada');
@@ -76,8 +76,10 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await expect(phone.getByText('Peixe · Grande')).toBeVisible();
   await expectAccessible(phone);
 
-  // A photographed printed template skips the corners and picks the kind.
+  // A photographed printed template skips the corners and picks the kind. Phones that open the
+  // site root, which used to be their app, land in /join/.
   await phone.goto('/');
+  await expect(phone).toHaveURL((url) => url.pathname === '/join/');
   await phone.getByRole('link', { name: 'Modelos para imprimir' }).click();
   await expect(phone.getByRole('heading', { name: 'Modelos para imprimir' })).toBeVisible();
   await expect(phone.getByRole('link', { name: /Baixar PDF/ })).toHaveCount(5);
@@ -86,7 +88,7 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await phone.getByTestId('gallery-input').setInputFiles({
     name: 'template.png',
     mimeType: 'image/png',
-    buffer: await templatePhoto(phone, '/templates/pt-BR/walk.svg'),
+    buffer: await templatePhoto(phone, '/join/templates/pt-BR/walk.svg'),
   });
   await expect(
     phone.getByText('Modelo reconhecido: os cantos foram encontrados sozinhos.'),
@@ -130,17 +132,19 @@ test('a drawing photographed on the phone swims on the TV', async ({ browser }) 
   await tv.keyboard.press('Escape');
   await tv.getByRole('button', { name: 'Encerrar aquário' }).click();
   await expect(tv.getByText('O aquário terminou.')).toBeVisible();
-  await phone.goto('/');
+  await phone.goto('/join/');
   await expect(phone.getByText('Este aquário terminou. Crie um novo na TV.')).toBeVisible();
 });
 
-test('the /pc/ page is driven with clicks', async ({ browser }) => {
+test('the site root is driven with clicks', async ({ browser }) => {
   const context = await browser.newContext({
     viewport: { width: 1600, height: 900 },
     locale: 'pt-BR',
   });
   const pc = await context.newPage();
+  // /pc/ was its address before the site root.
   await pc.goto('/pc/');
+  await expect(pc).toHaveURL((url) => url.pathname === '/');
   await pc.getByRole('button', { name: 'Novo aquário' }).click();
   const code = pc.getByTestId('join-code');
   await expect(code).toHaveText(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/, { timeout: 20_000 });

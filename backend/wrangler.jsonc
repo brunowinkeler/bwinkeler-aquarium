@@ -9,7 +9,7 @@
   "observability": { "enabled": true },
   "minify": true,
   "upload_source_maps": true,
-  // The PWA (and the TV browser build under /tv/); run `npm run build` before `wrangler dev`.
+  // The aquarium screen at / and /tv/, and the phone app under /join/; run `npm run build` before `wrangler dev`.
   "assets": {
     "directory": "../frontend/dist",
     "not_found_handling": "single-page-application",

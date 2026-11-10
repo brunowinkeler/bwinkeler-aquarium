@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router';
+import { Navigate, Outlet, Route, Routes, useSearchParams } from 'react-router';
 import { Layout } from './components/Layout';
 import { CreatePage } from './pages/CreatePage';
 import { CreaturesPage } from './pages/CreaturesPage';
@@ -8,16 +8,9 @@ import { TemplatesPage } from './pages/TemplatesPage';
 import { useI18n } from './i18n';
 import { useSession } from './session';
 
-function RequireSession() {
+function SessionPending() {
   const { state, refresh } = useSession();
   const { t } = useI18n();
-  if (state.status === 'loading') {
-    return (
-      <p className="status" role="status">
-        {t('common.loading')}
-      </p>
-    );
-  }
   if (state.status === 'offline') {
     return (
       <div className="panel" role="alert">
@@ -28,18 +21,36 @@ function RequireSession() {
       </div>
     );
   }
-  if (state.status === 'guest') return <Navigate to="/join" replace />;
+  return (
+    <p className="status" role="status">
+      {t('common.loading')}
+    </p>
+  );
+}
+
+function RequireSession() {
+  const { state } = useSession();
+  if (state.status === 'loading' || state.status === 'offline') return <SessionPending />;
+  if (state.status === 'guest') return <Navigate to="/" replace />;
   return <Outlet />;
+}
+
+/** The app's own address: the code form for guests and QR links, the home page once joined. */
+function Entry() {
+  const { state } = useSession();
+  const [params] = useSearchParams();
+  if (state.status === 'guest' || params.get('code')) return <JoinPage />;
+  if (state.status === 'loading' || state.status === 'offline') return <SessionPending />;
+  return <HomePage />;
 }
 
 export function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/join" element={<JoinPage />} />
+        <Route index element={<Entry />} />
         <Route path="/templates" element={<TemplatesPage />} />
         <Route element={<RequireSession />}>
-          <Route index element={<HomePage />} />
           <Route path="/new" element={<CreatePage />} />
           <Route path="/creatures" element={<CreaturesPage />} />
         </Route>

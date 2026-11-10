@@ -1,11 +1,11 @@
 import { formatJoinCode, type EndReason, type ServerMessage } from '@bwinkeler-aquarium/shared';
 import { SeaAmbience } from './ambience';
 import {
-  apiHost,
   createAquarium,
   disconnectPhones,
   endAquarium,
   issueJoinCode,
+  joinAddress,
   joinUrl,
   socketUrl,
   TvApiError,
@@ -113,7 +113,7 @@ export class TvApp {
 
   constructor(private readonly platform: TvPlatform) {
     applyTexts(document);
-    byId('join-open').textContent = text('joinOpen', { host: apiHost() });
+    byId('join-open').textContent = text('joinOpen', { host: joinAddress() });
     this.soundOn = platform.load(SOUND_KEY) !== 'off';
     this.light = platform.load(QUALITY_KEY) === 'light';
     this.showFps = platform.load(FPS_KEY) === 'on';
@@ -175,7 +175,7 @@ export class TvApp {
     };
   }
 
-  /** /pc/: clickable controls that fade out while the mouse rests. */
+  /** The site root: clickable controls that fade out while the mouse rests. */
   private setUpPointer(): void {
     const hint = this.join.querySelector('.join__hint');
     if (hint instanceof HTMLElement) hint.hidden = true;

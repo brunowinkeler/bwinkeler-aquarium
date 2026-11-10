@@ -31,7 +31,7 @@ export function Layout() {
       </a>
       <header className="header">
         <Link to="/" className="header__title">
-          <img src="/favicon.svg" alt="" width="28" height="28" />
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width="28" height="28" />
           {t('app.name')}
         </Link>
         <button

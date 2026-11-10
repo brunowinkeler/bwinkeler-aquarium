@@ -1,6 +1,6 @@
 import { normalizeJoinCode } from '@bwinkeler-aquarium/shared';
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { api, ApiError, errorMessageKey } from '../api';
 import { codeFromQr, QrScanner } from '../components/QrScanner';
 import { useI18n, type MessageKey } from '../i18n';
@@ -16,8 +16,6 @@ export function JoinPage() {
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
-
-  if (state.status === 'joined' && !linkedCode) return <Navigate to="/" replace />;
 
   const join = async (value: string) => {
     const normalized = normalizeJoinCode(value);

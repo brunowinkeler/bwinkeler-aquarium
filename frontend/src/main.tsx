@@ -13,7 +13,7 @@ if (!container) throw new Error('Missing #root container');
 
 createRoot(container).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <I18nProvider>
         <SessionProvider>
           <DraftProvider>

@@ -38,6 +38,13 @@ export default tseslint.config(
     ...reactHooks.configs.flat.recommended,
   },
   {
+    files: ['frontend/site/sw.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: { ...globals.serviceworker },
+    },
+  },
+  {
     // Shipped as-is to webOS 4 (Chromium 53); es-check also enforces ES5 syntax.
     files: ['spikes/tv-spike/**/*.js'],
     languageOptions: {

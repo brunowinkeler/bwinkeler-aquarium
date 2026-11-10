@@ -63,9 +63,10 @@ export function socketUrl(aquariumId: string): string {
 }
 
 export function joinUrl(code: string): string {
-  return API_BASE + '/join?code=' + code;
+  return API_BASE + '/join/?code=' + code;
 }
 
-export function apiHost(): string {
-  return API_BASE.replace(/^https?:\/\//, '');
+/** Where phones go, as people type it: `aquarium.bwinkeler.com/join`. */
+export function joinAddress(): string {
+  return API_BASE.replace(/^https?:\/\//, '') + '/join';
 }
